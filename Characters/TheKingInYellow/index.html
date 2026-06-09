@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/webp" href="Verity.webp">
+    <title>Archive - king_in_yellow_wifies</title>
+    <style>
+        @font-face {
+            font-family: 'Minecraftia';
+            src: local('Minecraftia'), url('../../Minecraftia.woff') format('woff');
+        }
+
+        /* Cache la barre de scroll principale tout en permettant le défilement */
+        html {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        html::-webkit-scrollbar {
+            display: none;
+        }
+
+        :root {
+            /* Panneau semi-transparent avec une légère teinte ambrée sombre */
+            --mc-panel: rgba(24, 21, 15, 0.85); 
+            --mc-panel-light: #3d3423;
+            --mc-panel-dark: #120e07;
+            --text-ghost: #ffcc00; /* Le jaune mystique du Roi en Jaune */
+            --text-gray: #8a8170;
+            --text-pale: #e0ca9b;   /* Couleur parchemin/or délavé */
+        }
+
+        body {
+            font-family: 'Minecraftia', 'Courier New', monospace;
+            background-color: #050505;
+            /* Remplace par ton image de fond si tu as un fond spécifique pour le Roi en Jaune */
+            background-image: url('banner.webp'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        img {
+            -webkit-user-drag: none;
+            user-drag: none;
+        }
+
+        .mc-btn-back {
+            display: inline-block;
+            background: rgba(46, 40, 30, 0.9);
+            border: 3px solid #000000;
+            border-top-color: #736449;
+            border-left-color: #736449;
+            border-right-color: #1f1a12;
+            border-bottom-color: #1f1a12;
+            padding: 10px 20px;
+            color: #d9c39e;
+            text-decoration: none;
+            font-size: 14px;
+            text-shadow: 2px 2px 0px #111;
+            margin-bottom: 30px;
+            cursor: pointer;
+        }
+
+        .mc-btn-back:hover {
+            background: #ffcc00;
+            border-top-color: #ffcc00;
+            border-left-color: #ffcc00;
+            color: #000000;
+            text-shadow: none;
+        }
+
+        .wiki-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--mc-panel);
+            border: 4px solid #000000;
+            box-shadow: inset 4px 4px 0px var(--mc-panel-light), 
+                        inset -4px -4px 0px var(--mc-panel-dark);
+            padding: 30px;
+        }
+
+        .wiki-title {
+            color: var(--text-ghost);
+            font-size: 24px;
+            /* Lueur jaune/dorée occulte derrière le titre */
+            text-shadow: 0px 0px 10px rgba(255, 204, 0, 0.5), 2px 2px 0px #000;
+            border-bottom: 4px solid #000000;
+            padding-bottom: 15px;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .wiki-subtitle {
+            color: var(--text-gray);
+            font-size: 12px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        /* --- YOUTUBE EMBED --- */
+        .video-credits-box {
+            background: rgba(18, 15, 11, 0.8); 
+            border: 4px solid #000000;
+            box-shadow: inset 2px 2px 0px #2b2419;
+            padding: 15px;
+            margin-bottom: 35px;
+        }
+
+        .video-title-label {
+            color: var(--text-pale);
+            font-size: 12px;
+            margin: 0 0 10px 0;
+            text-shadow: 1px 1px 0px #111;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border: 2px solid #1f1a12;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* --- LOG ENTRIES --- */
+        .wiki-entries {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .wiki-row {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+            background: rgba(23, 20, 14, 0.8); 
+            border: 4px solid #000000;
+            box-shadow: inset 2px 2px 0px #332b1e;
+            padding: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .wiki-row { grid-template-columns: 1fr; }
+        }
+
+        .mc-image-slot {
+            background: rgba(10, 8, 5, 0.7); 
+            border: 4px solid #3d3423;
+            border-top-color: #1c1810;
+            border-left-color: #1c1810;
+            border-right-color: #4f432e;
+            border-bottom-color: #4f432e;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .img-popup-link {
+            display: block;
+            cursor: zoom-in;
+        }
+
+        .mc-image-slot img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border: 2px solid #000;
+        }
+
+        .file-name {
+            font-size: 11px;
+            color: var(--text-pale);
+            margin: 8px 0 0 0;
+            text-shadow: 1px 1px 0px #111;
+            word-break: break-all;
+        }
+
+        .text-slot {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        /* --- COLLAPSIBLE DIALOGUES --- */
+        .mc-dropdown summary {
+            list-style: none;
+            cursor: pointer;
+            outline: none;
+        }
+        
+        .mc-dropdown summary::-webkit-details-marker {
+            display: none; 
+        }
+
+        .mc-dropdown summary:hover .quote-title {
+            color: #ffcc00; 
+            text-shadow: 0px 0px 4px rgba(255,204,0,0.5);
+        }
+
+        .quote-title {
+            color: var(--text-pale);
+            font-size: 12px;
+            margin: 0;
+            text-shadow: 1px 1px 0px #111;
+            display: inline-block;
+        }
+
+        .dropdown-arrow {
+            display: inline-block;
+            font-size: 10px;
+            margin-right: 6px;
+            transition: transform 0.15s ease-in-out;
+            color: var(--text-gray);
+        }
+
+        .mc-dropdown[open] .dropdown-arrow {
+            transform: rotate(90deg);
+            color: var(--text-ghost);
+        }
+
+        .quote-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #ffffff;
+            margin: 10px 0 0 0;
+            text-shadow: 1px 1px 0px #000;
+            font-style: italic;
+            
+            padding-left: 12px;
+            border-left: 2px solid #ffcc00; /* Ligne jaune pour les citations */
+        }
+
+        .context-note {
+            font-size: 11px;
+            color: #7a7161;
+            margin-top: 15px;
+            border-top: 1px dashed #3d3423;
+            padding-top: 5px;
+        }
+
+        /* --- EPISODE DIVIDER --- */
+        .episode-divider {
+            text-align: center;
+            border-top: 2px dashed #ffcc00;
+            border-bottom: 2px dashed #ffcc00;
+            padding: 20px 0;
+            margin: 40px 0 20px 0;
+            color: var(--text-ghost);
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-shadow: 1px 1px 0px #000;
+            background: rgba(23, 20, 14, 0.9); 
+        }
+
+        /* --- SYSTEM LIGHTBOX --- */
+        .lightbox {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            align-items: center;
+            justify-content: center;
+            cursor: zoom-out;
+            overflow: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .lightbox:target {
+            display: flex;
+        }
+
+        .lightbox-content {
+            background: var(--mc-panel);
+            border: 4px solid #000000;
+            box-shadow: inset 4px 4px 0px var(--mc-panel-light), 
+                        inset -4px -4px 0px var(--mc-panel-dark);
+            padding: 12px;
+            max-width: 95%;
+            box-sizing: border-box;
+            margin: auto;
+        }
+
+        .lightbox-content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border: 3px solid #000;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="../../index.html" class="mc-btn-back">< BACK TO MENU</a>
+    
+    <div class="wiki-container">
+        <div class="episode-divider">
+            [ Searching For A World That Doesn't Exist ]
+        </div>
+        <h1 class="wiki-title">Entity_File: The King in Yellow</h1>
+        <p class="wiki-subtitle">Investigated by Wifies // Lost Save Analysis</p>
+
+        <div class="video-credits-box">
+            <p class="video-title-label">[ WIFIES VIDEO / DOCUMENTARY ]</p>
+            <div class="video-wrapper">
+                <iframe 
+                    src="https://www.youtube.com/embed/3V7Rvo4Gvic" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <div class="wiki-entries">
+            
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#imgY1" class="img-popup-link">
+                        <img src="https://media.tenor.com/BE3_tWZkjOcAAAAe/at-the-crossroads-don%27t-turn-left.png" alt="Crossroads">
+                    </a>
+                    <p class="file-name">> crossroads.png</p>
+                </div>
+                <div class="text-slot">
+                    <details class="mc-dropdown" open> 
+                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LETTER]</span></summary>
+                        <div class="quote-text">
+                            <p style="margin: 5px 0 0 0; color: var(--text-ghost); font-style: normal;">"Whatever you do, at the crossroads, don't turn left."</p>
+                        </div>
+                    </details>
+                    <p class="context-note">Letter from d3rlord3 to Avery.</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="episode-divider">
+            [ Destroying A World That Doesn't Exist ]
+        </div>
+        <div class="video-credits-box">
+            <p class="video-title-label">[ WIFIES VIDEO / PART 2 ]</p>
+            <div class="video-wrapper">
+                <iframe 
+                    src="https://www.youtube.com/embed/NnTycJg1MIo" 
+                    title="YouTube video player" 
+                    frameborder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+        <div class="wiki-entries" id="king-part-2">
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#imgEnd" class="img-popup-link">
+                        <img src="https://i.postimg.cc/wjc0QjcR/Design-sans-titre-(4).png" alt="Lord">
+                    </a>
+                    <p class="file-name">> lord.png</p>
+                </div>
+                <div class="text-slot">
+                    <details class="mc-dropdown" open> 
+                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LETTER]</span></summary>
+                        <div class="quote-text">
+                            <p style="margin: 5px 0 0 0; font-style: normal;">&lt;d3rlord3&gt; As for you</p>
+                            <p style="margin: 5px 0 0 0; font-style: normal;">&lt;d3rlord3&gt; You idiot</p>
+                            <p style="margin: 5px 0 0 0; font-style: normal;">&lt;d3rlord3&gt; isn't it ironic</p>
+                            <p style="margin: 5px 0 0 0; font-style: normal;">&lt;d3rlord3&gt; That a king loses to a lord</p>
+                        </div>
+                    </details>
+                    <p class="context-note"></p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <a href="#close" class="lightbox" id="imgY1">
+        <div class="lightbox-content">
+            <img src="https://media.tenor.com/BE3_tWZkjOcAAAAe/at-the-crossroads-don%27t-turn-left.png" alt="The Letter Large">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> crossroads.png</p>
+        </div>
+    </a>
+
+    <a href="#close" class="lightbox" id="imgEnd">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/wjc0QjcR/Design-sans-titre-(4).png" alt="Lord">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> lord.png</p>
+        </div>
+    </a>
+
+</body>
+</html>

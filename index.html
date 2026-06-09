@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/webp" href="Characters/Verity/Verity.webp">
+
+    <title>[ERR] - Void Archives</title>
+    <style>
+        @font-face {
+            font-family: 'Minecraftia';
+            src: local('Minecraftia'), url('Minecraftia.woff') format('woff');
+        }
+
+        :root {
+            --mc-bg: #141414;
+            --mc-panel: #222222;
+            --mc-panel-light: #3c3c3c;
+            --mc-panel-dark: #121212;
+            --mc-button: #4a0000;
+            --mc-button-light: #7a0000;
+            --mc-button-dark: #220000;
+            --text-red: #ff5555;
+            --text-gold: #ffaa00;
+        }
+
+        body {
+            font-family: 'Minecraftia', 'Courier New', monospace;
+            background-color: #0b0b0b;
+            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('netherrack.png');
+            background-size: 64px;
+            image-rendering: pixelated;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            
+            /* Lock selection here */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        img {
+            -webkit-user-drag: none;
+            user-drag: none;
+            pointer-events: none; /* Completely ignores mouse interactions with images */
+        }
+
+        header {
+            background: #000000;
+            border-bottom: 4px solid #000000;
+            padding: 25px;
+            text-align: center;
+            box-shadow: inset 0 -4px 0 #330000;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+            color: var(--text-red);
+            text-shadow: 3px 3px 0px #3f0000;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: var(--mc-panel);
+            border: 4px solid #000000;
+            box-shadow: inset 4px 4px 0px var(--mc-panel-light), 
+                        inset -4px -4px 0px var(--mc-panel-dark);
+            padding: 25px;
+        }
+
+        h2 {
+            font-size: 18px;
+            color: #aaaaaa;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 0px #222;
+        }
+
+        .char-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .char-link {
+            text-decoration: none;
+            display: block;
+        }
+
+        .character-box {
+            display: flex;
+            gap: 20px;
+            background: #1a1a1a;
+            border: 4px solid #000000;
+            box-shadow: inset 3px 3px 0px #111111, inset -3px -3px 0px #2a2a2a;
+            padding: 15px;
+            align-items: center;
+            transition: transform 0.1s;
+        }
+
+        .char-link:hover .character-box {
+            background: #2a1a1a;
+            border-color: #ffffff;
+            box-shadow: inset 3px 3px 0px #4a1111, inset -3px -3px 0px #1a0a0a;
+        }
+
+        .char-img-slot {
+            width: 64px;
+            height: 64px;
+            background: #000000;
+            border: 4px solid #373737;
+            border-top-color: #222222;
+            border-left-color: #222222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .char-img-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        .char-details {
+            flex: 1;
+        }
+
+        .char-name {
+            font-size: 18px;
+            color: var(--text-red);
+            margin: 0 0 5px 0;
+            text-shadow: 2px 2px 0px #3f0000;
+        }
+
+        .char-link:hover .char-name {
+            color: #ffffff;
+            text-shadow: 2px 2px 0px var(--text-red);
+        }
+
+        .char-btn-desc {
+            font-size: 12px;
+            color: var(--text-gold);
+            margin: 0;
+            text-shadow: 1px 1px 0px #3f2a00;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>§4MINECRAFT_HORROR.JAR</h1>
+    </header>
+
+    <div class="container">
+        <h2>SELECT REPORT DATA</h2>
+
+        <div class="char-list">
+            
+            <a href="Characters/Verity/index.html" class="char-link">
+                <div class="character-box">
+                    <div class="char-img-slot">
+                        <img src="Characters/Verity/Verity.webp" alt="Skin">
+                    </div>
+                    <div class="char-details">
+                        <h3 class="char-name">Verity</h3>
+                        <p class="char-btn-desc">Hello! I'm Verity, your personnal helper friend!</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="Characters/TheKingInYellow/index.html" class="char-link">
+                <div class="character-box">
+                    <div class="char-img-slot" style="background-color: #ffffff;">
+                        <img src="https://i.ibb.co/99yNkzK1/Design-sans-titre-3.png" alt="Skin">
+                    </div>
+                    <div class="char-details">
+                        <h3 class="char-name">The King in Yellow</h3>
+                        <p class="char-btn-desc">[ CLICK TO OPEN LOG ]</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="Characters/Herobrine/index.html" class="char-link">
+                <div class="character-box">
+                    <div class="char-img-slot">
+                        <img src="https://media.forgecdn.net/avatars/thumbnails/1502/343/256/256/638976000076917783.png" alt="Skin">
+                    </div>
+                    <div class="char-details">
+                        <h3 class="char-name">Herobrine (From The Fog)</h3>
+                        <p class="char-btn-desc">[ CLICK TO OPEN LOG ]</p>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+</body>
+</html>
