@@ -155,6 +155,31 @@
             .wiki-row { grid-template-columns: 1fr; }
         }
 
+        .mc-image-slot.inline-slot {
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            align-items: flex-start;
+            width: 100%;
+            box-sizing: border-box;
+            align-self: stretch;
+        }
+
+        .mc-image-slot.inline-slot > div {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .mc-image-slot.inline-slot .file-name {
+            word-break: normal;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+        }
+
         .mc-image-slot {
             background: #0a0a0a;
             border: 4px solid #373737;
@@ -308,6 +333,38 @@
             border: 3px solid #000;
             cursor: default;
         }
+
+
+
+
+
+
+        .mob {
+            margin: 0 0 5px 0;
+             font-style: normal;
+        }
+
+        .twixxel {
+            margin: 0 0 5px 0;
+            font-style: normal;
+            color: aquamarine;
+        }
+
+        .verity {
+            margin: 0 0 5px 0;
+            font-style: normal;
+            color: var(--text-gold);
+        }
+
+        .action {
+            margin: 0; color: var(--text-gray);
+        }
+
+
+        .wiki-row.stacked-layout {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
 <body>
@@ -366,11 +423,11 @@
                     <details class="mc-dropdown">
                         <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Verity I have no brain cells what should I have for dinner tonight?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] You had pizza yesterday, maybe something else healthier... Like a salad!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; I... did have pizza yesterday...</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] You can ask me anything! I know everything!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Haha... Right... right... forgot.</p>
+                            <p class="mob">&lt;Mob&gt; Verity I have no brain cells what should I have for dinner tonight?</p>
+                            <p class="verity">[Verity] You had pizza yesterday, maybe something else healthier... Like a salad!</p>
+                            <p class="mob">&lt;Mob&gt; I... did have pizza yesterday...</p>
+                            <p class="verity">[Verity] You can ask me anything! I know everything!</p>
+                            <p class="mob">&lt;Mob&gt; Haha... Right... right... forgot.</p>
                         </div>
                     </details>
                     <p class="context-note">Verity knows everything.</p>
@@ -388,12 +445,12 @@
                     <details class="mc-dropdown">
                         <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Hey... Verity, is there another village nearby ? I wanna trade</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Yes! South, but I would avoid the one to the east.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Why?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Uhh... The villagers are gone.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Gone like... they dispawned?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Gone.</p>
+                            <p class="mob">&lt;Mob&gt; Hey... Verity, is there another village nearby ? I wanna trade</p>
+                            <p class="verity">[Verity] Yes! South, but I would avoid the one to the east.</p>
+                            <p class="mob">&lt;Mob&gt; Why?</p>
+                            <p class="verity">[Verity] Uhh... The villagers are gone.</p>
+                            <p class="mob">&lt;Mob&gt; Gone like... they dispawned?</p>
+                            <p class="verity">[Verity] Gone.</p>
                         </div>
                     </details>
                     <p class="context-note">Something ate them...</p>
@@ -411,13 +468,13 @@
                     <details class="mc-dropdown">
                         <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; color: var(--text-gray);">in the village</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Verity, what... what happened here?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Something passed through.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Like a raid? Pillagers?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] No.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Then what?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Something that was hungry...</p>
+                            <p class="action">in the village</p>
+                            <p class="mob">&lt;Mob&gt; Verity, what... what happened here?</p>
+                            <p class="verity">[Verity] Something passed through.</p>
+                            <p class="mob">&lt;Mob&gt; Like a raid? Pillagers?</p>
+                            <p class="verity">[Verity] No.</p>
+                            <p class="mob">&lt;Mob&gt; Then what?</p>
+                            <p class="verity">[Verity] Something that was hungry...</p>
                         </div>
                     </details>
                     <p class="context-note">he knows...</p>
@@ -435,16 +492,16 @@
                     <details class="mc-dropdown">
                         <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Good morning Verity. Is there something I need to know today?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Something is coming in 3 days.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; What?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Something is coming in 3 days.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; What's coming?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Something.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Something Bad?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Yes.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Well... Can I stop it?</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] You could've.</p>
+                            <p class="mob">&lt;Mob&gt; Good morning Verity. Is there something I need to know today?</p>
+                            <p class="verity">[Verity] Something is coming in 3 days.</p>
+                            <p class="mob">&lt;Mob&gt; What?</p>
+                            <p class="verity">[Verity] Something is coming in 3 days.</p>
+                            <p class="mob">&lt;Mob&gt; What's coming?</p>
+                            <p class="verity">[Verity] Something.</p>
+                            <p class="mob">&lt;Mob&gt; Something Bad?</p>
+                            <p class="verity">[Verity] Yes.</p>
+                            <p class="mob">&lt;Mob&gt; Well... Can I stop it?</p>
+                            <p class="verity">[Verity] You could've.</p>
                         </div>
                     </details>
                     <p class="context-note">he can't escape anymore...</p>
@@ -462,16 +519,16 @@
                     <details class="mc-dropdown">
                         <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LAST DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Alright, Verity.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; You know... i think you've been in this world longer than I have...</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; i think you knew what happened to those villagers.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; So... I'm gonna leave you here</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] That won't help.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; I'm going to my lookout.</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] I know where your base is!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Yeah, yeah of course you do. You know... you know everything...</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] It's already over Mob! YOU ARE MINE!</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] MIIIIIIIII...</p>
+                            <p class="mob">&lt;Mob&gt; Alright, Verity.</p>
+                            <p class="mob">&lt;Mob&gt; You know... i think you've been in this world longer than I have...</p>
+                            <p class="mob">&lt;Mob&gt; i think you knew what happened to those villagers.</p>
+                            <p class="mob">&lt;Mob&gt; So... I'm gonna leave you here</p>
+                            <p class="verity">[Verity] That won't help.</p>
+                            <p class="mob">&lt;Mob&gt; I'm going to my lookout.</p>
+                            <p class="verity">[Verity] I know where your base is!</p>
+                            <p class="mob">&lt;Mob&gt; Yeah, yeah of course you do. You know... you know everything...</p>
+                            <p class="verity">[Verity] It's already over Mob! YOU ARE MINE!</p>
+                            <p class="verity">[Verity] MIIIIIIIII...</p>
                         </div>
                     </details>
                     <p class="context-note">...</p>
@@ -517,7 +574,7 @@
         </div>
 
         <div class="wiki-entries" id="episode-2-logs">
-    </div>
+
         <div class="video-credits-box">
             <p class="video-title-label">[ RELATED VIDEO / CREDITS ]</p>
             <div class="video-wrapper">
@@ -540,17 +597,17 @@
                 <div class="text-slot">
                     <details class="mc-dropdown" closed> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [BEGINNING]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Verity!</p>
-                            <p style="margin: 0; color: var(--text-red);font-style: normal">[Verity] COME HERE!</p>
-                            <p style="margin: 0; color: var(--text-red);font-style: normal">[Verity] MOOOB! YOU CAN'T RUN</p>
-                            <p style="margin: 0; color: var(--text-gray);">Mob escapes from verity</p>
-                            <p style="margin: 0; color: var(--text-red);font-style: normal">[Verity] COME HERE!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Stop!</p>
-                            <p style="margin: 0; color: var(--text-gray);">Mob starts running for his life</p>
-                            <p style="margin: 0; color: var(--text-red);font-style: normal">[Verity] MOB!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; What did I do! Verity!</p>
-                            <p style="margin: 0; color: var(--text-red);"font-style: normal>[Verity] MOB!</p>
-                            <p style="margin: 0; color: var(--text-gray);">Mob gets back to his house</p>
+                            <p class="mob">&lt;Mob&gt; Verity!</p>
+                            <p class="verity">[Verity] COME HERE!</p>
+                            <p class="verity">[Verity] MOOOB! YOU CAN'T RUN</p>
+                            <p class="action">Mob escapes from verity</p>
+                            <p class="verity">[Verity] COME HERE!</p>
+                            <p class="mob">&lt;Mob&gt; Stop!</p>
+                            <p class="action">Mob starts running for his life</p>
+                            <p class="verity">[Verity] MOB!</p>
+                            <p class="mob">&lt;Mob&gt; What did I do! Verity!</p>
+                            <p class="verity">[Verity] MOB!</p>
+                            <p class="action">Mob gets back to his house</p>
                         </div>
                     </details>
                     <p class="context-note">An intense chase scene</p>
@@ -566,12 +623,12 @@
                 <div class="text-slot">
                     <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0; color: var(--text-red);font-style: normal">[Verity] MOB!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Verity STOP!</p>
-                            <p style="margin: 0; color: var(--text-red);font-style: normal">[Verity] MOB!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; I didn't do anything!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; PLEASE!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Verity wha-</p>
+                            <p class="verity">[Verity] MOB!</p>
+                            <p class="mob">&lt;Mob&gt; Verity STOP!</p>
+                            <p class="verity">[Verity] MOB!</p>
+                            <p class="mob">&lt;Mob&gt; I didn't do anything!</p>
+                            <p class="mob">&lt;Mob&gt; PLEASE!</p>
+                            <p class="mob">&lt;Mob&gt; Verity wha-</p>
                         </div>
                     </details>
                     <p class="context-note">Verity is at the door</p>
@@ -588,16 +645,16 @@
                 <div class="text-slot">
                     <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [VERITY]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Verity he's coming please...</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; I came back...</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; I came back for you okay?</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; I could have run further...But I didn't!</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Please... Verity</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] You came back... for... me?</p>
-                            <p style="margin: 0; color: var(--text-gray);">Mob sighs of relief</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Yes... yes I did Verity</p>
-                            <p style="margin: 0; color: var(--text-gray);">Mob sighs of relief <span style="font-size: 10px; vertical-align: middle;color: #003f00;">(x2)</span></p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; It's over... It's all over...</p>
+                            <p class="mob">&lt;Mob&gt; Verity he's coming please...</p>
+                            <p class="mob">&lt;Mob&gt; I came back...</p>
+                            <p class="mob">&lt;Mob&gt; I came back for you okay?</p>
+                            <p class="mob">&lt;Mob&gt; I could have run further...But I didn't!</p>
+                            <p class="mob">&lt;Mob&gt; Please... Verity</p>
+                            <p class="verity">[Verity] You came back... for... me?</p>
+                            <p class="action">Mob sighs of relief</p>
+                            <p class="mob">&lt;Mob&gt; Yes... yes I did Verity</p>
+                            <p class="action">Mob sighs of relief <span style="font-size: 10px; vertical-align: middle;color: #003f00;">(x2)</span></p>
+                            <p class="mob">&lt;Mob&gt; It's over... It's all over...</p>
                         </div>
                     </details>
                     <p class="context-note">He found something upstairs</p>
@@ -614,10 +671,10 @@
                 <div class="text-slot">
                     <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Morning Verity... anything I should know?</p>
-                            <p style="margin: 0; color: var(--text-gray);">Suspense sound effect</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Clearer skies today. There's a skeleton spawner 2 caves east from here if you want XP. You're almost out of Iron. I restocked your furnaces, i  thought it would be helpful.</p>
-                        <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Oh... thanks Verity.</p>
+                            <p class="mob">&lt;Mob&gt; Morning Verity... anything I should know?</p>
+                            <p class="action">Suspense sound effect</p>
+                            <p class="verity">[Verity] Clearer skies today. There's a skeleton spawner 2 caves east from here if you want XP. You're almost out of Iron. I restocked your furnaces, i thought it would be helpful.</p>
+                            <p class="mob">&lt;Mob&gt; Oh... thanks Verity.</p>
                         </div>
                     </details>
                     <p class="context-note">Morning</p>
@@ -640,26 +697,25 @@
                 <div class="text-slot">
                     <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; And there is the lava, Ughhh</p>
-                            <p style="margin: 0; color: var(--text-gray);">Mob slips and drops Verity into the lava</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Oh. No. Verity...</p>
-                            <p style="margin: 0; color: var(--text-gray);">Creepy music starts playing</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] no. no. no. no. no.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; No. WAIT.</p>
-                            <p style="margin: 0; color: var(--text-gray);">Verity gets angry</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] NO. NO. NO. NO. NO.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; WAIT. I'm sorry</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] NO. NO. DON'T DO THAT</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; I TRIPPED.</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] I THOUGHT WE WERE HAVING A NICE WALK</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; I SWEAR I TRIPPED.</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] ARE WE HAVING A NICE WALK</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; And you slipped out my hands... please Verity...</p>
-                            <p style="margin: 0; color: var(--text-gray);">Verity instantly gets normal again</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Okay</p>
-                            <p style="margin: 0; color: var(--text-gold);font-style: normal">[Verity] Your wall has a two block gap on the north side, by the way.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Okay... Thank you Verity.</p>
-
+                            <p class="mob">&lt;Mob&gt; And there is the lava, Ughhh</p>
+                            <p class="action">Mob slips and drops Verity into the lava</p>
+                            <p class="mob">&lt;Mob&gt; Oh. No. Verity...</p>
+                            <p class="action">Creepy music starts playing</p>
+                            <p class="verity">[Verity] no. no. no. no. no.</p>
+                            <p class="mob">&lt;Mob&gt; No. WAIT.</p>
+                            <p class="action">Verity gets angry</p>
+                            <p class="verity">[Verity] NO. NO. NO. NO. NO.</p>
+                            <p class="mob">&lt;Mob&gt; WAIT. I'm sorry</p>
+                            <p class="verity">[Verity] NO. NO. DON'T DO THAT</p>
+                            <p class="mob">&lt;Mob&gt; I TRIPPED.</p>
+                            <p class="verity">[Verity] I THOUGHT WE WERE HAVING A NICE WALK</p>
+                            <p class="mob">&lt;Mob&gt; I SWEAR I TRIPPED.</p>
+                            <p class="verity">[Verity] ARE WE HAVING A NICE WALK</p>
+                            <p class="mob">&lt;Mob&gt; And you slipped out my hands... please Verity...</p>
+                            <p class="action">Verity instantly gets normal again</p>
+                            <p class="verity">[Verity] Okay</p>
+                            <p class="verity">[Verity] Your wall has a two block gap on the north side, by the way.</p>
+                            <p class="mob">&lt;Mob&gt; Okay... Thank you Verity.</p>
                         </div>
                     </details>
                     <p class="context-note">Mob dropped Verity into the Lava</p>
@@ -676,13 +732,13 @@
                 <div class="text-slot">
                     <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; Look, I know how this sounds, but you have to trust me.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;color: aquamarine;">&lt;Twixxel_lesgo&gt; Dude, calm down it's just a Minecraft mod.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; A fucking Minecraft mod? You're not listening to me. There's a crazy ball in my world trying to fucking kill me.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;color: aquamarine;">&lt;Twixxel_lesgo&gt; Alright, What did you say happened?</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; He went into the lava. And he came back out. Okay? He was behind me just sitting there, but I watched him go in.</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;color: aquamarine;">&lt;Twixxel_lesgo&gt; And you're not editing anything?</p>
-                            <p style="margin: 0 0 5px 0; font-style: normal;">&lt;Mob&gt; i'm not editing anything bro. i've been holding this in for 3 days. I couldn't say anything out loud; I couldn't act weird. And I just had to be normal. But I can't do this anymore, i need you to come see this.</p>
+                            <p class="mob">&lt;Mob&gt; Look, I know how this sounds, but you have to trust me.</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Dude, calm down it's just a Minecraft mod.</p>
+                            <p class="mob">&lt;Mob&gt; A fucking Minecraft mod? You're not listening to me. There's a crazy ball in my world trying to fucking kill me.</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Alright, What did you say happened?</p>
+                            <p class="mob">&lt;Mob&gt; He went into the lava. And he came back out. Okay? He was behind me just sitting there, but I watched him go in.</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; And you're not editing anything?</p>
+                            <p class="mob">&lt;Mob&gt; i'm not editing anything bro. i've been holding this in for 3 days. I couldn't say anything out loud; I couldn't act weird. And I just had to be normal. But I can't do this anymore, i need you to come see this.</p>
                         </div>
                     </details>
                     <p class="context-note">Discord Call</p>
@@ -697,9 +753,408 @@
                     <p class="file-name">> Twixxel_Joined.png</p>
                 </div>
             </div>
-            12:18
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#ThinkAlone" class="img-popup-link">
+                        <img src="https://i.postimg.cc/gJTj1gFc/image.png" alt="Mob and Twixxel talking">
+                    </a>
+                    <p class="file-name">> dialog_01.png</p>
+                </div>
+                <div class="text-slot">
+                    <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; I think you have been alone too long</p>
+                            <p class="mob">&lt;Mob&gt; What?</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; He's a mod, a well made mod, but he's not like... doing anything. He answered some questions and made joke. You have been playing this world solo for how long?</p>
+                            <p class="action">Mob sights</p>
+                            <p class="mob">&lt;Mob&gt; You're not listening.</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; I am listening. I just think you're... bro... you're scared of a ball</p>
+                            <p class="mob">&lt;Mob&gt; This ball... transformed into a 12ft tall monster and tried to fucking mangle me.</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Did you check if it was him?</p>
+                            <p class="mob">&lt;Mob&gt; Bro, they look exactly alike</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; I will keep an eye on him, okay? But I'm not doing anything until I see something actually weird.</p>
+                            <p class="mob">&lt;Mob&gt; Okay, that's fine bro... whatever</p>
+                        </div>
+                    </details>
+                    <p class="context-note">Twixxel and Mob talking alone</p>
+                </div>
+            </div>
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#Chanel" class="img-popup-link">
+                        <img src="https://i.postimg.cc/Z5XSkX0G/image.png" alt="Verity and Twixxel Dialogue">
+                    </a>
+                    <p class="file-name">> dialog_02.png</p>
+
+                    <a href="#StartOfScaryThings" class="img-popup-link">
+                        <img src="https://i.postimg.cc/wTJPy3B4/image.png" alt="Mob and Twixxel Dialogue">
+                    </a>
+                    <p class="file-name">> dialog_03.png</p>
+                </div>
+
+                <div class="text-slot">
+                    <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Yeah it's been a rough week honestly</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; My schedule is horrible</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; But I have to keep pumping out videos</p>
+                            <p class="verity">[Verity] Take your time and don't forget to rest!</p>
+                            <p class="verity">[Verity] I really like your "I've genuinely never been this scared" series.</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Thank you! that series means a lot to me.</p>
+                            <p class="action">Twixxel realises he never told Verity about his Youtube Chanel</p>
+                            <p class="action">Twixxel asks Mob about it</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Did you tell him I was a Youtuber?</p>
+                            <p class="mob">&lt;Mob&gt; No?</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; That I make videos?</p>
+                            <p class="mob">&lt;Mob&gt; No!</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Wait how does he know that?!</p>
+                            <p class="mob">&lt;Mob&gt; Are you?... That's what I've been trying to tell you</p>
+                            <p class="verity">[Verity] Uh everything okay?</p>
+                            <p class="action">Twixxel and Mob answer "Yeah" at the same time</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Alright, I will start looking into it</p>
+                        </div>
+                    </details>
+                    <p class="context-note">That's where weird things start</p>
+                </div>
+            </div>
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#Building" class="img-popup-link">
+                        <img src="https://i.postimg.cc/zGGCmP4H/image.png" alt="Dialogue">
+                    </a>
+                    <p class="file-name">> dialog_04.png</p>
+                    <a href="#rolls" class="img-popup-link">
+                        <img src="https://i.postimg.cc/1tvSdXFD/image.png" alt="Verity rolls into the room">
+                    </a>
+                    <p class="file-name">> dialog_05.png</p>
+                </div>
+                <div class="text-slot">
+                    <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="mob">&lt;Mob&gt; Me and Twixxel are gonna be building, so stay here, Okay? I don't want you to get dusty.</p>
+
+                            <p class="action">Mob joins Twixxel and they start whispering in secret</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Okay so there is like 4 theories online.</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; lava doesn't work. We know that, but some people are saying that...</p>
+                            <p class="action">Verity rolls and enter the room</p>
+                            <p class="verity">[Verity] What? the other room is booriiing</p>
+                            <p class="action">Twixxel asks in private messages if Mob opened the door, and Mob slightly shakes his head no</p>
+
+                            <p class="action">Mob puts verity in the chest</p>
+                            <p class="mob">&lt;Mob&gt; Stay in there okay?</p>
+                            <p class="action">Twixxel and Mob starts whispering again</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; right... so the Wiki has nothing, but there's this old forum post from someone who had the same mod and they said...</p>
+                            <p class="action">Verity gently opens the chest and peeks out</p>
+                            <p class="mob">&lt;Mob&gt; No. Verity what did I say?!</p>
+                            <p class="action">Mob puts a cobblestone block on the chest</p>
+                            <p class="mob">&lt;Mob&gt; Stay in there.</p>
+                            <p class="action">Twixxel and Mob's dialog continues</p>
+                            <p class="mob">&lt;Mob&gt; Okay... keep going, what were you gonna say?</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; I can't keep going, the chest is just...</p>
+                            <p class="action">Verity opens the chest, breaking the block above it, and exit the chest, falling to the ground</p>
+                            <p class="verity">[Verity] Well, that was uncomfortable</p>
+                        </div>
+                    </details>
+                    <p class="context-note">Twixxel and Mob are trying to talk without letting Verity hear them</p>
+                </div>
+            </div>
+
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#clingy" class="img-popup-link">
+                        <img src="https://i.postimg.cc/pd2XcgSf/image.png" alt="Verity and Twixxel Dialogue again">
+                    </a>
+                    <p class="file-name">> dialog_06.png</p>
+                </div>
+
+                <div class="text-slot">
+                    <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="action">Mob to Verity</p>
+                            <p class="mob">&lt;Mob&gt; Me and Twixxel need to talk okay? So stay here! It's not even about you or anything. It's just... it's personnal</p>
+                            <p class="verity">[Verity] Uhh Okay</p>
+                            <p class="action">Mob exits the house</p>
+                            <p class="mob">&lt;Mob&gt; Stay here</p>
+                            <p class="action">Mob and Twixxel starts running away from the house</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Okay i found something, there's this one post, just one from a guy who had this mod 2 years ago, and he said the only thing that worked was...</p>
+                            <p class="action">verity starts playing his creepy music</p>
+                            <p class="mob">&lt;Mob&gt; oh my god</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; He can hear us out there... can't he?</p>
+                            <p class="mob">&lt;Mob&gt; Yeah I'm pretty sure</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; I see what you mean now</p>
+                            <p class="action">mob starts whispering</p>
+                            <p class="mob">&lt;Mob&gt; I'll keep verity distracted, you go to your house and research until you something, alright?</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; I got you</p>
+                        </div>
+                    </details>
+                    <p class="context-note">Verity can hear them</p>
+                </div>
+            </div>
+            
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#question" class="img-popup-link">
+                        <img src="https://i.postimg.cc/g0nkPvYw/image.png" alt="Verity gets suspicious">
+                    </a>
+                    <p class="file-name">> dialog_07.png</p>
+                    <a href="#twixxel_enters" class="img-popup-link">
+                        <img src="https://i.postimg.cc/ZYFm2f8h/image.png" alt="Twixxel enters the house">
+                    </a>
+                    <p class="file-name">> Twixxel_enters.png</p>
+                </div>
+
+                <div class="text-slot">
+                    <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="verity">[Verity] Where is he?</p>
+                            <p class="mob">&lt;Mob&gt; Who?</p>
+                            <p class="verity">[Verity] Your friend</p>
+                            <p class="mob">&lt;Mob&gt; He's um... he went exploring... he wanted to like... see the world</p>
+                            <p class="verity">[Verity] Hm...</p>
+                            <p class="action">Mob messages Twixxel, telling him Verity noticed he was gone. Twixxel tells him to not let verity out of his sight</p>
+                            <p class="action">Some time after, Twixxel enters the house</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Mob, Okay, I found it!</p>
+                            <p class="action">Twixxel sees Verity</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; Nevermind... I will tell you later</p>
+                            <p class="verity">[Verity] Tell him what?</p>
+                            <p class="twixxel">&lt;Twixxel_lesgo&gt; um, just some stuff I found exploring, cool biomes, nothing interesting</p>
+                            <p class="verity">[Verity] That's good. I'm glad you're enjoying this.</p>
+                            <p class="verity">[Verity] it's not like it's a single biome world...</p>
+                            <p class="action">Twixxel exits and closes the door</p>
+                        </div>
+                    </details>
+                    <p class="context-note">Verity knows</p>
+                </div>
+            </div>
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#HiTwixxel" class="img-popup-link">
+                        <img src="https://i.postimg.cc/hjcyd0f9/image.png" alt="Verity enters Twixxel's house">
+                    </a>
+                    <p class="file-name">> verity(1).png</p>
+                    <a href="#monster" class="img-popup-link">
+                        <img src="https://i.postimg.cc/pLjqcSj5/image.png" alt="Verity transforms into a monster">
+                    </a>
+                    <p class="file-name">> monster.png</p>
+                </div>
+
+                <div class="text-slot">
+                    <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="action">In the middle of the night, while Twixxel is crafting</p>
+                            <p class="verity">[Verity] Hi Twixxel!</p>
+                            <p class="action">Verity rolls into the room and transform into a monster</p>
+                        </div>
+                    </details>
+                    <p class="context-note">It's too late</p>
+                </div>
+            </div>
+
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#Goodbye" class="img-popup-link">
+                        <img src="https://i.postimg.cc/tRSs8CtJ/image.png" alt="Mob talking to Verity">
+                    </a>
+                    <p class="file-name">> Goodbye.png</p>
+                </div>
+
+                <div class="text-slot">
+                    <details class="mc-dropdown"> <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="action">Mobs looks at Twixxel's house from his window</p>
+                            <p class="mob">&lt;Mob&gt; Huh?</p>
+                            <p class="mob">&lt;Mob&gt; Where the f...</p>
+                            <p class="mob">&lt;Mob&gt; uhhh... Verity?</p>
+                            <p class="verity">[Verity] He left.</p>
+                            <p class="mob">&lt;Mob&gt; Left where?</p>
+                            <p class="verity">[Verity] He decided to go home.</p>
+                            <p class="mob">&lt;Mob&gt; Well, he would have said goodbye</p>
+                            <p class="verity">[Verity] I guess he was in a hurry... hahaha</p>
+                            <p class="mob">&lt;Mob&gt; No...</p>
+                            <p class="mob">&lt;Mob&gt; No...</p>
+                            <p class="action">Mob exits his house and go to Twixxels house, only to find blood on the ground</p>
+                            <p class="mob">&lt;Mob&gt; No. No. Ugh... No... NO... Oh my god, Twixxel. Why did I invite you?</p>
+                            <p class="action">Mob comes back to his house</p>
+                            <p class="verity">[Verity] It's just us again.</p>
+                            <p class="verity">[Verity] Isn't t hat better?</p>
+                            <p class="action">Mob approaches Verity, then go to sleep</p>
+                        </div>
+                    </details>
+                    <p class="context-note">Mob knows</p>
+                </div>
+            </div>
+
+            <div class="wiki-row stacked-layout">
+                    <div class="mc-image-slot inline-slot">
+                        <div>
+                            <a href="#book" class="img-popup-link">
+                                <img src="https://i.postimg.cc/cCXLSTny/image.png" alt="hidden book">
+                            </a>
+                            <p class="file-name">> book_page1.png</p>
+                        </div>
+
+                        <div>
+                            <a href="#book2" class="img-popup-link">
+                                <img src="https://i.postimg.cc/4Nx35Crp/image.png" alt="hidden book">
+                            </a>
+                            <p class="file-name">> book_page2.png</p>
+                        </div>
+
+                        <div>
+                            <a href="#book3" class="img-popup-link">
+                                <img src="https://i.postimg.cc/cC4dXY5R/image.png" alt="hidden book">
+                            </a>
+                            <p class="file-name">> book_page3.png</p>
+                        </div>
+
+                        <div>
+                            <a href="#book31" class="img-popup-link">
+                                <img src="https://i.postimg.cc/C5PSt13V/image.png" alt="hidden book">
+                            </a>
+                            <p class="file-name">> book_page31.png</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-slot">
+                        <details class="mc-dropdown"> 
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action">Mob goes exploring and finds Twixxel's hidden place</p>
+                                <p class="action">After finding an hidden chest, Mob finds a book and read it</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Hidden</p>
+                    </div>
+            </div>
+
+                    </div> <div class="episode-divider">
+                        [ Episode 3 not Out yet :) But check out this video ]
+                    </div>
+
+                <div class="video-credits-box">
+                    <p class="video-title-label">[ RELATED VIDEO / Inspired video ]</p>
+                    <div class="video-wrapper">
+                        <iframe 
+                            src="https://www.youtube.com/embed/gG7UTqwDiD0" 
+                            title="YouTube video player" 
+                            frameborder="0" 
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+    
+            
     </div>
 
+    <a href="#close" class="lightbox" id="book">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/cCXLSTny/image.png" alt="hidden book">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> book_page1.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="book2">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/4Nx35Crp/image.png" alt="hidden book">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> book_page2.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="book3">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/cC4dXY5R/image.png" alt="hidden book">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> book_page3.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="book31">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/C5PSt13V/image.png" alt="hidden book">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> book_page31.png</p>
+        </div>
+    </a>
+
+
+
+
+
+
+
+
+    <a href="#close" class="lightbox" id="Goodbye">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/tRSs8CtJ/image.png" alt="Mob talking to Verity">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> Goodbye.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="monster">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/pLjqcSj5/image.png" alt="Verity transforms into a monster">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> monster.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="HiTwixxel">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/hjcyd0f9/image.png" alt="Verity enters Twixxel's house">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> verity(1).png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="twixxel_enters">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/ZYFm2f8h/image.png"" alt="Twixxel enters the house">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> Twixxel_enters.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="question">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/g0nkPvYw/image.png"" alt="Verity gets suspicious">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> dialog_07.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="clingy">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/pd2XcgSf/image.png" alt="Dialogue again">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> dialog_06.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="rolls">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/1tvSdXFD/image.png" alt="Verity rolls into the room">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> dialog_05.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="Building">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/zGGCmP4H/image.png" alt="Dialogue">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> dialog_04.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="StartOfScaryThings">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/wTJPy3B4/image.png" alt="Mob and Twixxel Dialogue">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> dialog_03.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="Chanel">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/Z5XSkX0G/image.png" alt="Verity and Twixxel Dialogue">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> dialog_02.png</p>
+        </div>
+    </a>
+    <a href="#close" class="lightbox" id="ThinkAlone">
+        <div class="lightbox-content">
+            <img src="https://i.postimg.cc/gJTj1gFc/image.png" alt="Mob and Twixxel talking">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> dialog_01.png</p>
+        </div>
+    </a>
     <a href="#close" class="lightbox" id="joined">
         <div class="lightbox-content">
             <img src="https://i.postimg.cc/FRPx3BXd/image.png" alt="Twixxel Joined the game">
