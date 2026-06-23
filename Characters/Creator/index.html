@@ -3,44 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/webp" href="Verity.webp">
-    <title>Archive - herobrine_fog_logs</title>
+    <link rel="icon" type="image/png" href="Creator.png">
+    <title>Archive - multiplayer_new_logs</title>
     <style>
         @font-face {
             font-family: 'Minecraftia';
             src: local('Minecraftia'), url('../../Minecraftia.woff') format('woff');
         }
-
         html {
-            /* Pour Firefox */
+            /* For Firefox */
             scrollbar-width: none;
-            
-            /* Pour Internet Explorer et Edge Legacy */
+            /* For Internet Explorer and Edge Legacy */
             -ms-overflow-style: none;
         }
 
-        /* Pour Chrome, Safari, Opera et les versions récentes d'Edge */
+        /* For Chrome, Safari, Opera and recent Edge versions */
         html::-webkit-scrollbar {
             display: none;
         }
         :root {
-            /* Utilisation de rgba() pour rendre le panneau principal semi-transparent */
-            --mc-panel: rgba(26, 26, 26, 0.85); 
-            --mc-panel-light: #2e2e2e;
-            --mc-panel-dark: #0a0a0a;
-            --text-ghost: #ffffff; 
-            --text-gray: #999999;
-            --text-pale: #b0c4de;   
+            --mc-panel: #222222;
+            --mc-panel-light: #3c3c3c;
+            --mc-panel-dark: #121212;
+            --text-red: #ff5555;
+            --text-gray: #aaaaaa;
+            --text-white: #ffffff;
         }
 
         body {
             font-family: 'Minecraftia', 'Courier New', monospace;
-            background-color: #050505;
-            /* Ton image de fond directe, centrée et fixe */
-            background-image: url('banner.webp');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
+            background-color: #0b0b0b;
+            background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url('../../netherrack.png');
+            background-size: 64px;
             color: #ffffff;
             margin: 0;
             padding: 20px;
@@ -58,27 +52,26 @@
 
         .mc-btn-back {
             display: inline-block;
-            background: rgba(58, 58, 58, 0.9);
+            background: #555555;
             border: 3px solid #000000;
-            border-top-color: #888888;
-            border-left-color: #888888;
-            border-right-color: #222222;
-            border-bottom-color: #222222;
+            border-top-color: #ababab;
+            border-left-color: #ababab;
+            border-right-color: #353535;
+            border-bottom-color: #353535;
             padding: 10px 20px;
             color: #e0e0e0;
             text-decoration: none;
             font-size: 14px;
-            text-shadow: 2px 2px 0px #111;
+            text-shadow: 2px 2px 0px #222;
             margin-bottom: 30px;
             cursor: pointer;
         }
 
         .mc-btn-back:hover {
-            background: #ffffff;
-            border-top-color: #ffffff;
-            border-left-color: #ffffff;
-            color: #000000;
-            text-shadow: none;
+            background: #7a2222;
+            border-top-color: #ba5555;
+            border-left-color: #ba5555;
+            color: #fff;
         }
 
         .wiki-container {
@@ -92,9 +85,10 @@
         }
 
         .wiki-title {
-            color: var(--text-ghost);
+            color: var(--text-red);
             font-size: 24px;
-            text-shadow: 0px 0px 8px rgba(255, 255, 255, 0.6), 2px 2px 0px #000;
+            /* Effet Glow Rouge sur le titre principal */
+            text-shadow: 0 0 4px #ff555575, 0 0 12px #ff0000, 2px 2px 0px #222;
             border-bottom: 4px solid #000000;
             padding-bottom: 15px;
             margin-top: 0;
@@ -110,18 +104,18 @@
 
         /* --- YOUTUBE EMBED --- */
         .video-credits-box {
-            background: rgba(17, 17, 17, 0.8); /* Semi-transparent */
+            background: #141414;
             border: 4px solid #000000;
-            box-shadow: inset 2px 2px 0px #222222;
+            box-shadow: inset 2px 2px 0px #252525;
             padding: 15px;
             margin-bottom: 35px;
         }
 
         .video-title-label {
-            color: var(--text-pale);
+            color: var(--text-red);
             font-size: 12px;
             margin: 0 0 10px 0;
-            text-shadow: 1px 1px 0px #111;
+            text-shadow: 0 0 4px #ff5555, 1px 1px 0px #000;
         }
 
         .video-wrapper {
@@ -129,7 +123,7 @@
             padding-bottom: 56.25%;
             height: 0;
             overflow: hidden;
-            border: 2px solid #222222;
+            border: 2px solid #373737;
         }
 
         .video-wrapper iframe {
@@ -151,9 +145,9 @@
             display: grid;
             grid-template-columns: 280px 1fr;
             gap: 20px;
-            background: rgba(20, 20, 20, 0.8); /* Semi-transparent */
+            background: #181818;
             border: 4px solid #000000;
-            box-shadow: inset 2px 2px 0px #222222;
+            box-shadow: inset 2px 2px 0px #252525;
             padding: 15px;
         }
 
@@ -161,17 +155,43 @@
             .wiki-row { grid-template-columns: 1fr; }
         }
 
+        .mc-image-slot.inline-slot {
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            align-items: flex-start;
+            width: 100%;
+            box-sizing: border-box;
+            align-self: stretch;
+        }
+
+        .mc-image-slot.inline-slot > div {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .mc-image-slot.inline-slot .file-name {
+            word-break: normal;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-align: left;
+        }
+
         .mc-image-slot {
-            background: rgba(5, 5, 5, 0.7); /* Semi-transparent */
-            border: 4px solid #2a2a2a;
-            border-top-color: #111111;
-            border-left-color: #111111;
-            border-right-color: #3a3a3a;
-            border-bottom-color: #3a3a3a;
+            background: #0a0a0a;
+            border: 4px solid #373737;
+            border-top-color: #1a1a1a;
+            border-left-color: #1a1a1a;
+            border-right-color: #4a4a4a;
+            border-bottom-color: #4a4a4a;
             padding: 8px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            align-self: start; 
         }
 
         .img-popup-link {
@@ -189,9 +209,9 @@
 
         .file-name {
             font-size: 11px;
-            color: var(--text-pale);
+            color: var(--text-red);
             margin: 8px 0 0 0;
-            text-shadow: 1px 1px 0px #111;
+            text-shadow: 1px 1px 0px #3f0000;
             word-break: break-all;
         }
 
@@ -214,12 +234,12 @@
         }
 
         .mc-dropdown summary:hover .quote-title {
-            color: #ffffff; 
-            text-shadow: 0px 0px 4px rgba(255,255,255,0.5);
+            color: var(--text-red); 
+            text-shadow: 0 0 4px #ff5555;
         }
 
         .quote-title {
-            color: var(--text-pale);
+            color: var(--text-white);
             font-size: 12px;
             margin: 0;
             text-shadow: 1px 1px 0px #111;
@@ -236,7 +256,8 @@
 
         .mc-dropdown[open] .dropdown-arrow {
             transform: rotate(90deg);
-            color: var(--text-ghost);
+            color: var(--text-red);
+            text-shadow: 0 0 4px #ff5555;
         }
 
         .quote-text {
@@ -244,33 +265,32 @@
             line-height: 1.6;
             color: #ffffff;
             margin: 10px 0 0 0;
-            text-shadow: 1px 1px 0px #000;
+            text-shadow: 1px 1px 0px #111;
             font-style: italic;
-            
             padding-left: 12px;
-            border-left: 2px solid #555;
+            border-left: 2px solid #444;
         }
 
         .context-note {
             font-size: 11px;
-            color: #666;
+            color: #777;
             margin-top: 15px;
-            border-top: 1px dashed #222;
+            border-top: 1px dashed #333;
             padding-top: 5px;
         }
 
         /* --- EPISODE DIVIDER --- */
         .episode-divider {
             text-align: center;
-            border-top: 2px dashed #333;
-            border-bottom: 2px dashed #333;
+            border-top: 2px dashed #444;
+            border-bottom: 2px dashed #444;
             padding: 20px 0;
             margin: 40px 0 20px 0;
             color: var(--text-gray);
             font-size: 14px;
             letter-spacing: 2px;
             text-shadow: 1px 1px 0px #000;
-            background: rgba(17, 17, 17, 0.8); /* Semi-transparent */
+            background: #141414;
         }
 
         /* --- SYSTEM LIGHTBOX --- */
@@ -282,7 +302,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.95);
+            background-color: rgba(0, 0, 0, 0.9);
             align-items: center;
             justify-content: center;
             cursor: zoom-out;
@@ -296,7 +316,7 @@
         }
 
         .lightbox-content {
-            background: rgba(26, 26, 26, 0.95);
+            background: var(--mc-panel);
             border: 4px solid #000000;
             box-shadow: inset 4px 4px 0px var(--mc-panel-light), 
                         inset -4px -4px 0px var(--mc-panel-dark);
@@ -313,6 +333,43 @@
             border: 3px solid #000;
             cursor: default;
         }
+
+        /* --- CHARACTER DESIGN STYLES --- */
+        .char-creator {
+            margin: 0 0 5px 0;
+            font-style: normal;
+            color: var(--text-red);
+            /* Effet Glow Rouge sur le texte du Creator */
+            text-shadow: 0 0 4px #ff55550c, 0 0 10px #ff0000;
+        }
+
+        .char-thatmob {
+            margin: 0 0 5px 0;
+            font-style: normal;
+            color: coral;
+        }
+
+        .char-idaios {
+            margin: 0 0 5px 0;
+            font-style: normal;
+            color: darkolivegreen;
+        }
+
+        .char-twixxel {
+            margin: 0 0 5px 0;
+            font-style: normal;
+            color: var(--text-white);
+        }
+
+        .action {
+            margin: 0; 
+            color: var(--text-gray);
+        }
+
+        .wiki-row.stacked-layout {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </head>
 <body>
@@ -320,14 +377,19 @@
     <a href="../../" class="mc-btn-back">< BACK TO MENU</a>
 
     <div class="wiki-container">
-        <h1 class="wiki-title">Entity_File: Herobrine</h1>
-        <p class="wiki-subtitle">Recovered from /.minecraft/config/From_The_Fog.json</p>
+        
+        <h1 class="wiki-title">Entity_File: Creator</h1>
+        <p class="wiki-subtitle">Recovered from /.minecraft/saves/New World/level.dat</p>
+        
+        <div class="episode-divider">
+            [ INSERT EPISODE TITLE HERE ]
+        </div>
 
         <div class="video-credits-box">
-            <p class="video-title-label">[ RELATED VIDEO / REPORTED SIGHTINGS ]</p>
+            <p class="video-title-label">[ RELATED VIDEO / CREDITS ]</p>
             <div class="video-wrapper">
                 <iframe 
-                    src="https://www.youtube.com/embed/COCHE_TON_ID_ICI" 
+                    src="https://www.youtube.com/embed/YOUR_VIDEO_ID" 
                     title="YouTube video player" 
                     frameborder="0" 
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
@@ -340,39 +402,36 @@
             
             <div class="wiki-row">
                 <div class="mc-image-slot">
-                    <a href="#imgH1" class="img-popup-link">
-                        <img src="https://via.placeholder.com/280x160" alt="Sighting 1">
+                    <a href="#img1" class="img-popup-link">
+                        <img src="https://via.placeholder.com/280x150" alt="Image Placeholder">
                     </a>
-                    <p class="file-name">> fog_sighting_01.png</p>
+                    <p class="file-name">> log_scene_01.png</p>
                 </div>
                 <div class="text-slot">
                     <details class="mc-dropdown" open> 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED MESSAGES]</span></summary>
+                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
                         <div class="quote-text">
-                            <p style="margin: 0; font-style: normal;">I didn't write anything yet :(</p>
-                            <p style="margin: 5px 0 0 0; color: var(--text-ghost); font-style: normal;">His eyes are white? that's all I can say</p>
+                            <p class="char-thatmob">&lt;Thatmob&gt; Your dialogue line here...</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Your dialogue line here...</p>
+                            <p class="char-idaios">&lt;Idaios&gt; Your dialogue line here...</p>
+                            <p class="action">* Dynamic event description *</p>
+                            <p class="char-creator">[Creator] Glowing creator response here...</p>
                         </div>
                     </details>
-                    <p class="context-note">No context here.</p>
+                    <p class="context-note">Context note description goes here.</p>
                 </div>
             </div>
 
-        </div>
+        </div> 
 
         <div class="episode-divider">
-            [ From The Fog Mod ]
+            [ INSERT NEXT SECTION TITLE HERE ]
         </div>
 
-        <div class="wiki-entries" id="episode-2-logs">
+        <div class="wiki-entries">
+            </div>
 
     </div>
-
-    <a href="#close" class="lightbox" id="imgH1">
-        <div class="lightbox-content">
-            <img src="https://via.placeholder.com/800x450" alt="Sighting 1 Large">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> fog_sighting_01.png</p>
-        </div>
-    </a>
 
 </body>
 </html>
