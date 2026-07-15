@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,28 +13,89 @@
         }
 
         :root {
-            --mc-bg: #141414;
+            /* 🌍 THÈME PAR DÉFAUT (CIEL / BLEU) */
+            --bg-image: url('Ciel.png');
+            --bg-overlay: rgba(135, 206, 235, 0.3);
+            --bg-color: #4da6ff;
+            
+            --bg-size: cover;
+            --bg-repeat: no-repeat;
+            --bg-attachment: fixed;
+            --bg-position: center;
+            
             --mc-panel: #222222;
             --mc-panel-light: #3c3c3c;
             --mc-panel-dark: #121212;
-            --mc-button: #4a0000;
-            --mc-button-light: #7a0000;
-            --mc-button-dark: #220000;
-            --text-red: #ff5555;
-            --text-gold: #ffaa00;
+            
+            --theme-primary: #55ffff;
+            --theme-secondary: #aaaaaa;
+            --theme-header-shadow: #004466;
+            
+            --theme-hover-bg: #1a2a3a;
+            --theme-hover-border: #ffffff;
+            --theme-hover-shadow-light: #11334a;
+            --theme-hover-shadow-dark: #0a1a2a;
+        }
+
+        /* 🔴 THÈME ROUGE (Appliqué via la classe .active-red sur body) */
+        body.active-red {
+            --bg-image: url('netherrack.png'); 
+            --bg-overlay: rgba(0, 0, 0, 0.85);
+            --bg-color: #0b0b0b;
+            
+            --bg-size: 64px;
+            --bg-repeat: repeat;
+            --bg-attachment: scroll;
+            --bg-position: top left;
+            
+            --theme-primary: #ff5555;
+            --theme-secondary: #ffaa00;
+            --theme-header-shadow: #3f0000;
+            
+            --theme-hover-bg: #2a1a1a;
+            --theme-hover-border: #ffffff;
+            --theme-hover-shadow-light: #4a1111;
+            --theme-hover-shadow-dark: #1a0a0a;
+        }
+
+        /* 🟡 THÈME JAUNE (Appliqué via la classe .active-yellow sur body) */
+        body.active-yellow {
+            --bg-image: url('Ciel.png');
+            --bg-overlay: rgba(20, 20, 0, 0.85);
+            --bg-color: #1a1a0b;
+            
+            --bg-size: cover;
+            --bg-repeat: no-repeat;
+            --bg-attachment: fixed;
+            --bg-position: center;
+            
+            --theme-primary: #ffff55;
+            --theme-secondary: #ffaa00;
+            --theme-header-shadow: #3f3f00;
+            
+            --theme-hover-bg: #2a2a1a;
+            --theme-hover-border: #ffff55;
+            --theme-hover-shadow-light: #4a4a11;
+            --theme-hover-shadow-dark: #1a1a0a;
         }
 
         body {
             font-family: 'Minecraftia', 'Courier New', monospace;
-            background-color: #0b0b0b;
-            background-image: linear-gradient(rgba(0,0,0,0.85), rgba(0,0,0,0.85)), url('netherrack.png');
-            background-size: 64px;
+            background-color: var(--bg-color);
+            background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), var(--bg-image);
+            
+            background-size: var(--bg-size);
+            background-repeat: var(--bg-repeat);
+            background-attachment: var(--bg-attachment);
+            background-position: var(--bg-position);
+            
             image-rendering: pixelated;
             color: #ffffff;
             margin: 0;
             padding: 0;
             
-            /* Lock selection here */
+            transition: background-color 0.3s, background-image 0.3s, background-size 0.3s;
+            
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
@@ -44,7 +105,7 @@
         img {
             -webkit-user-drag: none;
             user-drag: none;
-            pointer-events: none; /* Completely ignores mouse interactions with images */
+            pointer-events: none;
         }
 
         header {
@@ -52,14 +113,16 @@
             border-bottom: 4px solid #000000;
             padding: 25px;
             text-align: center;
-            box-shadow: inset 0 -4px 0 #330000;
+            box-shadow: inset 0 -4px 0 var(--theme-header-shadow);
+            transition: box-shadow 0.3s;
         }
 
         header h1 {
             margin: 0;
             font-size: 26px;
-            color: var(--text-red);
-            text-shadow: 3px 3px 0px #3f0000;
+            color: var(--theme-primary);
+            text-shadow: 3px 3px 0px var(--theme-header-shadow);
+            transition: color 0.3s, text-shadow 0.3s;
         }
 
         .container {
@@ -100,13 +163,21 @@
             box-shadow: inset 3px 3px 0px #111111, inset -3px -3px 0px #2a2a2a;
             padding: 15px;
             align-items: center;
-            transition: transform 0.1s;
+            transition: all 0.2s;
         }
 
-        .char-link:hover .character-box {
-            background: #2a1a1a;
-            border-color: #ffffff;
-            box-shadow: inset 3px 3px 0px #4a1111, inset -3px -3px 0px #1a0a0a;
+        body.active-red .char-link.theme-red:hover .character-box {
+            background: var(--theme-hover-bg);
+            border-color: var(--theme-hover-border);
+            box-shadow: inset 3px 3px 0px var(--theme-hover-shadow-light), 
+                        inset -3px -3px 0px var(--theme-hover-shadow-dark);
+        }
+
+        body.active-yellow .char-link.theme-yellow:hover .character-box {
+            background: var(--theme-hover-bg);
+            border-color: var(--theme-hover-border);
+            box-shadow: inset 3px 3px 0px var(--theme-hover-shadow-light), 
+                        inset -3px -3px 0px var(--theme-hover-shadow-dark);
         }
 
         .char-img-slot {
@@ -135,36 +206,39 @@
 
         .char-name {
             font-size: 18px;
-            color: var(--text-red);
+            color: var(--theme-primary);
             margin: 0 0 5px 0;
-            text-shadow: 2px 2px 0px #3f0000;
+            text-shadow: 2px 2px 0px var(--theme-header-shadow);
+            transition: color 0.3s;
         }
 
-        .char-link:hover .char-name {
+        body.active-red .char-link.theme-red:hover .char-name,
+        body.active-yellow .char-link.theme-yellow:hover .char-name {
             color: #ffffff;
-            text-shadow: 2px 2px 0px var(--text-red);
+            text-shadow: 2px 2px 0px var(--theme-primary);
         }
 
         .char-btn-desc {
             font-size: 12px;
-            color: var(--text-gold);
+            color: var(--theme-secondary);
             margin: 0;
-            text-shadow: 1px 1px 0px #3f2a00;
+            text-shadow: 1px 1px 0px #111;
+            transition: color 0.3s;
         }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>§4MINECRAFT_HORROR.JAR</h1>
+        <h1 id="headerTitle">§4MINECRAFT_ARG.JAR</h1>
     </header>
 
     <div class="container">
         <h2>SELECT REPORT DATA</h2>
 
-        <div class="char-list">
+        <div class="char-list" id="charList">
             
-            <a href="Characters/Verity/" class="char-link">
+            <a href="Characters/Verity/" class="char-link theme-red">
                 <div class="character-box">
                     <div class="char-img-slot">
                         <img src="Characters/Verity/Verity.webp" alt="Skin">
@@ -176,7 +250,7 @@
                 </div>
             </a>
 
-            <a href="Characters/Creator/" class="char-link">
+            <a href="Characters/Creator/" class="char-link theme-red">
                 <div class="character-box">
                     <div class="char-img-slot">
                         <img src="https://i.ibb.co/NdzwLT5j/Design-sans-titre-5.png" alt="Skin">
@@ -188,7 +262,7 @@
                 </div>
             </a>
 
-            <a href="Characters/TheKingInYellow/" class="char-link">
+            <a href="Characters/TheKingInYellow/" class="char-link theme-yellow">
                 <div class="character-box">
                     <div class="char-img-slot" style="background-color: #ffffff;">
                         <img src="https://i.ibb.co/99yNkzK1/Design-sans-titre-3.png" alt="Skin">
@@ -201,6 +275,35 @@
             </a>
         </div>
     </div>
+
+    <script>
+        const body = document.body;
+        const charList = document.getElementById('charList');
+        const characters = document.querySelectorAll('.char-link');
+        const headerTitle = document.getElementById('headerTitle');
+
+        characters.forEach(char => {
+            char.addEventListener('mouseenter', () => {
+                if (char.classList.contains('theme-red')) {
+                    // C'est un personnage d'horreur
+                    headerTitle.textContent = "§4MINECRAFT_HORROR.JAR";
+                    body.classList.remove('active-yellow');
+                    body.classList.add('active-red');
+                } else if (char.classList.contains('theme-yellow')) {
+                    // C'est The King in Yellow (ARG seulement, pas horreur)
+                    headerTitle.textContent = "§4MINECRAFT_ARG.JAR";
+                    body.classList.remove('active-red');
+                    body.classList.add('active-yellow');
+                }
+            });
+        });
+
+        // Remet tout par défaut (y compris le titre ARG original) quand on sort de la boîte
+        charList.addEventListener('mouseleave', () => {
+            body.classList.remove('active-red', 'active-yellow');
+            headerTitle.textContent = "§4MINECRAFT_ARG.JAR";
+        });
+    </script>
 
 </body>
 </html>
