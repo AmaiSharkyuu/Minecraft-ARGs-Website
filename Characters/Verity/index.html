@@ -5,371 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/webp" href="Verity.webp">
     <title>Archive - Verity</title>
-    <style>
-        @font-face {
-            font-family: 'Minecraftia';
-            src: local('Minecraftia'), url('../../Minecraftia.woff') format('woff');
-        }
-        html {
-            scrollbar-width: none;
-            
-            -ms-overflow-style: none;
-        }
-
-        html::-webkit-scrollbar {
-            display: none;
-        }
-        :root {
-            --mc-panel: #222222;
-            --mc-panel-light: #3c3c3c;
-            --mc-panel-dark: #121212;
-            --text-red: #ff5555;
-            --text-gray: #aaaaaa;
-            --text-gold: #ffaa00;
-        }
-
-        body {
-            font-family: 'Minecraftia', 'Courier New', monospace;
-            background-color: #0b0b0b;
-            background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url('../../netherrack.png');
-            background-size: 64px;
-            color: #ffffff;
-            margin: 0;
-            padding: 20px;
-            
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        img {
-            -webkit-user-drag: none;
-            user-drag: none;
-        }
-
-        .mc-btn-back {
-            display: inline-block;
-            background: #555555;
-            border: 3px solid #000000;
-            border-top-color: #ababab;
-            border-left-color: #ababab;
-            border-right-color: #353535;
-            border-bottom-color: #353535;
-            padding: 10px 20px;
-            color: #e0e0e0;
-            text-decoration: none;
-            font-size: 14px;
-            text-shadow: 2px 2px 0px #222;
-            margin-bottom: 30px;
-            cursor: pointer;
-        }
-
-        .mc-btn-back:hover {
-            background: #7a2222;
-            border-top-color: #ba5555;
-            border-left-color: #ba5555;
-            color: #fff;
-        }
-
-        .wiki-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: var(--mc-panel);
-            border: 4px solid #000000;
-            box-shadow: inset 4px 4px 0px var(--mc-panel-light), 
-                        inset -4px -4px 0px var(--mc-panel-dark);
-            padding: 30px;
-        }
-
-        .wiki-title {
-            color: var(--text-red);
-            font-size: 24px;
-            text-shadow: 2px 2px 0px #3f0000;
-            border-bottom: 4px solid #000000;
-            padding-bottom: 15px;
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-
-        .wiki-subtitle {
-            color: var(--text-gray);
-            font-size: 12px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
-        }
-
-        /* --- YOUTUBE EMBED --- */
-        .video-credits-box {
-            background: #141414;
-            border: 4px solid #000000;
-            box-shadow: inset 2px 2px 0px #252525;
-            padding: 15px;
-            margin-bottom: 35px;
-        }
-
-        .video-title-label {
-            color: var(--text-gold);
-            font-size: 12px;
-            margin: 0 0 10px 0;
-            text-shadow: 1px 1px 0px #3f2a00;
-        }
-
-        .video-wrapper {
-            position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border: 2px solid #373737;
-        }
-
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* --- LOG ENTRIES --- */
-        .wiki-entries {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .wiki-row {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 20px;
-            background: #181818;
-            border: 4px solid #000000;
-            box-shadow: inset 2px 2px 0px #252525;
-            padding: 15px;
-        }
-
-        @media (max-width: 768px) {
-            .wiki-row { grid-template-columns: 1fr; }
-        }
-
-        .mc-image-slot.inline-slot {
-            display: flex;
-            flex-direction: row;
-            gap: 16px;
-            align-items: flex-start;
-            width: 100%;
-            box-sizing: border-box;
-            align-self: stretch;
-        }
-
-        .mc-image-slot.inline-slot > div {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .mc-image-slot.inline-slot .file-name {
-            word-break: normal;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: left;
-        }
-
-        .mc-image-slot {
-            background: #0a0a0a;
-            border: 4px solid #373737;
-            border-top-color: #1a1a1a;
-            border-left-color: #1a1a1a;
-            border-right-color: #4a4a4a;
-            border-bottom-color: #4a4a4a;
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            
-            align-self: start; 
-        }
-
-        .img-popup-link {
-            display: block;
-            cursor: zoom-in;
-        }
-
-        .mc-image-slot img {
-            width: 100%;
-            height: auto;
-            display: block;
-            image-rendering: auto; 
-            border: 2px solid #000;
-        }
-
-        .file-name {
-            font-size: 11px;
-            color: #55ff55;
-            margin: 8px 0 0 0;
-            text-shadow: 1px 1px 0px #003f00;
-            word-break: break-all;
-        }
-
-        .text-slot {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 10px;
-        }
-
-        /* --- COLLAPSIBLE DIALOGUES --- */
-        .mc-dropdown summary {
-            list-style: none;
-            cursor: pointer;
-            outline: none;
-        }
+    <link rel="stylesheet" href="../Verity/Verity.css">
         
-        .mc-dropdown summary::-webkit-details-marker {
-            display: none; 
-        }
-
-        .mc-dropdown summary:hover .quote-title {
-            color: #ffdf55; 
-        }
-
-        .quote-title {
-            color: var(--text-gold);
-            font-size: 12px;
-            margin: 0;
-            text-shadow: 1px 1px 0px #3f2a00;
-            display: inline-block;
-        }
-
-        .dropdown-arrow {
-            display: inline-block;
-            font-size: 10px;
-            margin-right: 6px;
-            transition: transform 0.15s ease-in-out;
-            color: var(--text-gray);
-        }
-
-        .mc-dropdown[open] .dropdown-arrow {
-            transform: rotate(90deg);
-            color: var(--text-gold);
-        }
-
-        .quote-text {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #ffffff;
-            margin: 10px 0 0 0;
-            text-shadow: 1px 1px 0px #111;
-            font-style: italic;
-            
-            padding-left: 12px;
-            border-left: 2px solid #444;
-        }
-
-        .context-note {
-            font-size: 11px;
-            color: #777;
-            margin-top: 15px;
-            border-top: 1px dashed #333;
-            padding-top: 5px;
-        }
-
-        /* --- EPISODE DIVIDER (NOUVEAU) --- */
-        .episode-divider {
-            text-align: center;
-            border-top: 2px dashed #444;
-            border-bottom: 2px dashed #444;
-            padding: 20px 0;
-            margin: 40px 0 20px 0;
-            color: var(--text-gray);
-            font-size: 14px;
-            letter-spacing: 2px;
-            text-shadow: 1px 1px 0px #000;
-            background: #141414;
-        }
-
-        /* --- SYSTEM LIGHTBOX --- */
-        .lightbox {
-            display: none;
-            position: fixed;
-            z-index: 999;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            align-items: center;
-            justify-content: center;
-            cursor: zoom-out;
-            overflow: auto;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        .lightbox:target {
-            display: flex;
-        }
-
-        .lightbox-content {
-            background: var(--mc-panel);
-            border: 4px solid #000000;
-            box-shadow: inset 4px 4px 0px var(--mc-panel-light), 
-                        inset -4px -4px 0px var(--mc-panel-dark);
-            padding: 12px;
-            max-width: 95%;
-            box-sizing: border-box;
-            margin: auto;
-        }
-
-        .lightbox-content img {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            border: 3px solid #000;
-            cursor: default;
-        }
-        /* --- CHARACTERS --- */
-        .mob {
-            margin: 0 0 5px 0;
-             font-style: normal;
-        }
-
-        .twixxel {
-            margin: 0 0 5px 0;
-            font-style: normal;
-            color: aquamarine;
-        }
-
-        .verity {
-            margin: 0 0 5px 0;
-            font-style: normal;
-            color: var(--text-gold);
-        }
-
-        .grox {
-            margin: 0 0 5px 0;
-            font-style: normal;
-            color: rgb(227, 98, 195);
-        }
-
-        .HumanOversight {
-            margin: 0 0 5px 0;
-            font-style: normal;
-            color:rgb(119, 180, 241);
-        }
-
-        .action {
-            margin: 0; color: var(--text-gray);
-        }
-        
-
-        .wiki-row.stacked-layout {
-            display: flex;
-            flex-direction: column;
-        }
-    </style>
 </head>
 <body>
 
@@ -1310,7 +947,7 @@
                             <p class="verity">[Verity] I don't.</p>
                             <p class="mob">&lt;Mob&gt; then why is there a bathroom there?</p>
                             <p class="mob">&lt;Mob&gt; Hold on</p>
-                            <p class="action">Mob destroys the toilets then exits</p>
+                            <p class="action">Mob "destroys" the toilets then exits</p>
                             <p class="action">Mob finds a super cool thing that looks like a portal</p>
                             <p class="mob">&lt;Mob&gt; Whoa... What is this? </p>
                             <p class="verity">[Verity] Every world I inhabit has one. It anchors me to the instance. I wasn't made in Minecraft.</p>
@@ -1633,8 +1270,28 @@
                 [  EPISODE 4 WILL BE ON GROX'S CHANNEL ]
             </div>
 
+            <div class="wiki-row" style="grid-template-columns: 1fr;">
+                <div class="mc-image-slot">
+                    <a href="#Post" class="img-popup-link">
+                        <img src="../Verity/Images/Grox'sLastPost.webp" alt="Grox's last post">
+                    </a>
+                    <p class="file-name">> Post.webp</p>
+                </div>
+            </div>
+
+
         </div>
     </div>
+
+    <a href="#close" class="lightbox" id="Post">
+        <div class="lightbox-content">
+            <img src="../Verity/Images/book_page31.webp" alt="hidden book">
+            <p class="file-name" style="text-align: center; margin-top: 10px;">> book_page31.webp</p>
+        </div>
+    </a>
+
+
+
 
     <a href="#close" class="lightbox" id="Dead">
         <div class="lightbox-content">
@@ -1812,7 +1469,6 @@
             <p class="file-name" style="text-align: center; margin-top: 10px;">> book_page31.webp</p>
         </div>
     </a>
-
     <a href="#close" class="lightbox" id="Goodbye">
         <div class="lightbox-content">
             <img src="../Verity/Images/Goodbye.webp" alt="Mob talking to Verity">
