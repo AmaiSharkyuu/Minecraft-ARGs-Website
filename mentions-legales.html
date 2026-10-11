@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/webp" href="Characters/Verity/Verity.webp">
-    <title>Mentions légales — Void Archives</title>
+    <title>Mentions légales · Void Archives</title>
     <meta name="description" content="Mentions légales du site Void Archives : éditeur, hébergeur, propriété intellectuelle et données personnelles.">
     <meta name="robots" content="noindex, follow">
     <style>
@@ -13,173 +13,310 @@
             src: local('Minecraftia'), url('Minecraftia.woff') format('woff');
         }
 
+        html { scrollbar-width: thin; scrollbar-color: #555 #111; scroll-behavior: smooth; }
+
         :root {
-            --bg-image: url('Ciel.png');
-            --bg-overlay: rgba(10, 20, 30, 0.75);
-            --bg-color: #4da6ff;
-
-            --mc-panel: #222222;
-            --mc-panel-light: #3c3c3c;
-            --mc-panel-dark: #121212;
-
-            --theme-primary: #55ffff;
-            --theme-secondary: #aaaaaa;
-            --theme-header-shadow: #004466;
+            --accent: #55ffff;
+            --accent-dark: #004466;
+            --gray: #aaaaaa;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Minecraftia', 'Courier New', monospace;
-            background-color: var(--bg-color);
-            background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), var(--bg-image);
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-position: center;
-            image-rendering: pixelated;
-            color: #ffffff;
+            background: #1a2433;
+            color: #fff;
             margin: 0;
-            padding: 0;
+            image-rendering: pixelated;
         }
 
+        /* Le panorama de l'écran titre, flouté, comme derrière les menus du jeu */
+        .cube-scene {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: -2;
+            filter: blur(6px) brightness(0.55);
+            transform: scale(1.05);
+        }
+        .cube { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; }
+        .cube > div {
+            position: absolute;
+            width: 2052px;
+            height: 2052px;
+            margin: -1026px 0 0 -1026px;
+            background-size: 100% 100%;
+            backface-visibility: hidden;
+        }
+        .cube .f0 { background-image: url('Panorama/panorama_0.webp'); transform: translateZ(-1024px); }
+        .cube .f1 { background-image: url('Panorama/panorama_1.webp'); transform: rotateY(-90deg) translateZ(-1024px); }
+        .cube .f2 { background-image: url('Panorama/panorama_2.webp'); transform: rotateY(180deg) translateZ(-1024px); }
+        .cube .f3 { background-image: url('Panorama/panorama_3.webp'); transform: rotateY(90deg) translateZ(-1024px); }
+        .cube .f4 { background-image: url('Panorama/panorama_4.webp'); transform: rotateX(-90deg) translateZ(-1024px); }
+        .cube .f5 { background-image: url('Panorama/panorama_5.webp'); transform: rotateX(90deg) translateZ(-1024px); }
+
+        /* =========================================================
+           EN-TÊTE, comme le titre d'un écran de menu
+           ========================================================= */
         header {
-            background: #000000;
-            border-bottom: 4px solid #000000;
-            padding: 25px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
             text-align: center;
-            box-shadow: inset 0 -4px 0 var(--theme-header-shadow);
+            padding: 18px 16px 14px;
+            background: rgba(0, 0, 0, 0.6);
+            border-bottom: 2px solid #000;
+            box-shadow: 0 2px 0 rgba(255, 255, 255, 0.08);
         }
-
         header h1 {
             margin: 0;
-            font-size: 26px;
-            color: var(--theme-primary);
-            text-shadow: 3px 3px 0px var(--theme-header-shadow);
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 50px auto;
-            background: var(--mc-panel);
-            border: 4px solid #000000;
-            box-shadow: inset 4px 4px 0px var(--mc-panel-light),
-                        inset -4px -4px 0px var(--mc-panel-dark);
-            padding: 25px;
-        }
-
-        h2 {
+            font-weight: normal;
             font-size: 18px;
-            color: #aaaaaa;
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 25px;
-            text-shadow: 2px 2px 0px #222;
+            color: #fff;
+            text-shadow: 2px 2px 0 #3f3f3f;
         }
+        header p { margin: 4px 0 0; font-size: 10px; color: var(--gray); }
 
-        h3 {
-            font-size: 14px;
-            color: var(--theme-primary);
-            text-shadow: 2px 2px 0px var(--theme-header-shadow);
-            margin: 28px 0 10px;
+        /* Sommaire : petits boutons Minecraft */
+        .toc {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin: 12px auto 0;
+            max-width: 760px;
         }
+        .toc a {
+            font-size: 10px;
+            color: #e0e0e0;
+            text-decoration: none;
+            background: #6f6f6f;
+            border: 2px solid #000;
+            box-shadow: inset 2px 2px 0 #aaaaaa, inset -2px -2px 0 #3c3c3c;
+            padding: 4px 8px;
+            text-shadow: 1px 1px 0 #383838;
+        }
+        .toc a:hover { background: #7e86b8; box-shadow: inset 2px 2px 0 #bec6ff, inset -2px -2px 0 #3a4170; color: #ffffa0; }
 
-        p, li {
-            font-size: 13px;
+        /* =========================================================
+           CONTENU
+           ========================================================= */
+        main { max-width: 760px; margin: 0 auto; padding: 24px 16px 20px; }
+
+        .intro {
+            font-size: 12px;
             line-height: 1.9;
-            color: #dddddd;
+            color: #e8e8e8;
+            text-align: center;
+            margin: 0 0 22px;
+            text-shadow: 1px 1px 0 #000;
+        }
+        .site-name {
+            text-align: center;
+            margin: 0 0 8px;
+            font-weight: normal;
+            font-size: 16px;
+            color: var(--accent);
+            text-shadow: 2px 2px 0 var(--accent-dark);
         }
 
-        ul { padding-left: 20px; }
-
-        a { color: #55aaff; }
+        section {
+            background: rgba(0, 0, 0, 0.62);
+            border: 2px solid #000;
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.07);
+            padding: 18px 20px;
+            margin-bottom: 14px;
+            scroll-margin-top: 130px;
+        }
+        section h2 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 12px;
+            font-weight: normal;
+            font-size: 14px;
+            color: #ffff55;
+            text-shadow: 2px 2px 0 #3f3f00;
+        }
+        section h2 span {
+            display: inline-block;
+            min-width: 26px;
+            text-align: center;
+            font-size: 11px;
+            color: #000;
+            background: #ffff55;
+            padding: 2px 6px;
+            text-shadow: none;
+        }
+        section p { margin: 0 0 12px; font-size: 12px; line-height: 1.9; color: #e0e0e0; }
+        section p:last-child { margin-bottom: 0; }
+        strong { color: var(--accent); font-weight: normal; }
+        a { color: var(--accent); }
+        a:hover { color: #ffffa0; }
 
         .info-box {
-            background: #1a1a1a;
-            border: 4px solid #000000;
-            box-shadow: inset 3px 3px 0px #111111, inset -3px -3px 0px #2a2a2a;
-            padding: 15px 20px;
-            margin-bottom: 18px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #000;
+            box-shadow: inset 2px 2px 0 rgba(255,255,255,0.06);
+            padding: 12px 14px;
+            margin: 0 0 12px;
         }
+        .info-box p { margin: 0 0 8px; }
+        .small { font-size: 11px !important; color: #9a9a9a !important; }
 
-        .info-box strong { color: var(--theme-primary); }
+        .updated { text-align: center; font-size: 10px; color: var(--gray); margin: 20px 0 0; text-shadow: 1px 1px 0 #000; }
 
-        .updated {
-            font-size: 11px;
-            color: #777777;
-            text-align: right;
-            margin-top: 35px;
+        /* Bouton « Terminé » en bas, comme dans les menus */
+        .done-bar {
+            position: sticky;
+            bottom: 0;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.6);
+            border-top: 2px solid #000;
+            box-shadow: 0 -2px 0 rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: center;
         }
-
-        .back {
+        .mc-btn {
             display: block;
+            width: min(400px, 100%);
             text-align: center;
-            margin: 25px 0 60px;
-            font-size: 12px;
-            color: #aaaaaa;
+            font-family: inherit;
+            background: #6f6f6f;
+            border: 2px solid #000;
+            box-shadow: inset 2px 2px 0 #aaaaaa, inset -2px -2px 0 #3c3c3c;
+            padding: 10px 12px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 13px;
+            text-shadow: 2px 2px 0 #383838;
+        }
+        .mc-btn:hover { background: #7e86b8; box-shadow: inset 2px 2px 0 #bec6ff, inset -2px -2px 0 #3a4170; color: #ffffa0; }
+
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>MENTIONS LÉGALES</h1>
-</header>
-
-<div class="container">
-
-    <h2>Void Archives — Minecraft ARGs</h2>
-
-    <p>Conformément à l'article 6 III de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN), voici les informations relatives à l'éditeur et à l'hébergeur de ce site.</p>
-
-    <h3>1. Éditeur du site</h3>
-    <div class="info-box">
-        <p>
-            <strong>Éditeur / Directeur de la publication :</strong> AmaiSharkyuu (pseudonyme)<br>
-            <strong>Statut :</strong> personne physique éditant un site à titre non professionnel et non lucratif<br>
-            <strong>Contact :</strong> <a href="mailto:Contact@amaicraft.fr">Contact@amaicraft.fr</a>
-        </p>
-        <p style="font-size: 11px; color: #999;">En application de l'article 6 III 2 de la LCEN, l'éditeur non professionnel a choisi de rester anonyme auprès du public. Ses coordonnées complètes sont détenues par l'hébergeur et sont communicables sur réquisition de l'autorité judiciaire.</p>
+    <div class="cube-scene" id="cubeScene">
+        <div class="cube" id="cube">
+            <div class="f0"></div><div class="f1"></div><div class="f2"></div>
+            <div class="f3"></div><div class="f4"></div><div class="f5"></div>
+        </div>
     </div>
 
-    <h3>2. Hébergeur</h3>
-    <div class="info-box">
-        <p>
-            <strong>GitHub Pages</strong> — GitHub, Inc.<br>
-            88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis<br>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer">github.com</a> —
-            <a href="https://support.github.com" target="_blank" rel="noopener noreferrer">support.github.com</a>
-        </p>
+    <header>
+        <h1>Mentions l&eacute;gales</h1>
+        <p>Void Archives &middot; Minecraft ARGs</p>
+        <nav class="toc">
+            <a href="#editeur">1. &Eacute;diteur</a>
+            <a href="#hebergeur">2. H&eacute;bergeur</a>
+            <a href="#fan">3. Site de fan</a>
+            <a href="#contenus">4. Contenus</a>
+            <a href="#pi">5. Propri&eacute;t&eacute;</a>
+            <a href="#donnees">6. Donn&eacute;es</a>
+            <a href="#liens">7. Liens</a>
+            <a href="#responsabilite">8. Responsabilit&eacute;</a>
+            <a href="#droit">9. Droit</a>
+        </nav>
+    </header>
+
+    <main>
+        <h2 class="site-name">Void Archives &middot; Minecraft ARGs</h2>
+        <p class="intro">Conformément à l'article 6 III de la loi n° 2004-575 du 21 juin 2004 pour la confiance dans l'économie numérique (LCEN), voici les informations relatives à l'éditeur et à l'hébergeur de ce site.</p>
+
+        <section id="editeur">
+            <h2><span>1</span> Éditeur du site</h2>
+            <div class="info-box">
+                <p>
+                    <strong>Éditeur / Directeur de la publication :</strong> AmaiSharkyuu (pseudonyme)<br>
+                    <strong>Statut :</strong> personne physique éditant un site à titre non professionnel et non lucratif<br>
+                    <strong>Contact :</strong> <a href="mailto:Contact@amaicraft.fr">Contact@amaicraft.fr</a>
+                </p>
+            </div>
+            <p class="small">En application de l'article 6 III 2 de la LCEN, l'éditeur non professionnel a choisi de rester anonyme auprès du public. Ses coordonnées complètes sont détenues par l'hébergeur et sont communicables sur réquisition de l'autorité judiciaire.</p>
+        </section>
+
+        <section id="hebergeur">
+            <h2><span>2</span> Hébergeur</h2>
+            <div class="info-box">
+                <p>
+                    <strong>GitHub Pages</strong> · GitHub, Inc.<br>
+                    88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis<br>
+                    <a href="https://github.com" target="_blank" rel="noopener noreferrer">github.com</a> ·
+                    <a href="https://support.github.com" target="_blank" rel="noopener noreferrer">support.github.com</a>
+                </p>
+            </div>
+        </section>
+
+        <section id="fan">
+            <h2><span>3</span> Site non officiel : contenu de fan</h2>
+            <p>Ce site est une archive communautaire consacrée à des ARG (jeux en réalité alternée) et créations horrifiques inspirés de Minecraft. Il est réalisé par un fan et n'est <strong>ni affilié, ni approuvé, ni sponsorisé</strong> par Mojang Studios, Microsoft, ni par les auteurs des ARG, personnages, mods ou vidéos évoqués.</p>
+            <p>« Minecraft » est une marque déposée de Mojang Studios / Microsoft Corporation. Les personnages, récits, images, sons et autres éléments cités ou reproduits restent la propriété de leurs auteurs et ayants droit respectifs, et sont utilisés à des fins d'information et d'illustration dans un cadre non commercial.</p>
+            <p>Toute demande de retrait émanant d'un ayant droit sera traitée dans les meilleurs délais à l'adresse de contact ci-dessus.</p>
+        </section>
+
+        <section id="contenus">
+            <h2><span>4</span> Nature des contenus</h2>
+            <p>Les récits, personnages et « archives » présentés relèvent de la <strong>fiction</strong>. Aucun élément de ce site ne doit être interprété comme la relation de faits réels. Certains contenus peuvent évoquer une ambiance horrifique et ne pas convenir à un jeune public sensible.</p>
+        </section>
+
+        <section id="pi">
+            <h2><span>5</span> Propriété intellectuelle</h2>
+            <p>Hors éléments appartenant à des tiers, les textes originaux, la mise en page et le code source de ce site sont la propriété de l'éditeur. Toute reproduction ou réutilisation, totale ou partielle, sans autorisation préalable est interdite.</p>
+        </section>
+
+        <section id="donnees">
+            <h2><span>6</span> Données personnelles et cookies</h2>
+            <p>Ce site est entièrement statique : aucun formulaire, aucun compte utilisateur, <strong>aucun outil de mesure d'audience</strong> et <strong>aucun cookie déposé par l'éditeur</strong>. Aucune donnée personnelle n'est collectée directement par l'éditeur.</p>
+            <p>Certaines pages intègrent des vidéos YouTube. Leur affichage et leur lecture peuvent entraîner le dépôt de cookies ou de traceurs par Google / YouTube, sous sa propre responsabilité : voir les <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">règles de confidentialité de Google</a>.</p>
+            <p>Pour des raisons techniques et de sécurité, GitHub peut enregistrer des données de connexion (adresse IP, date, page consultée) lors de l'affichage des pages. Ce traitement relève de GitHub, Inc. : voir sa <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement" target="_blank" rel="noopener noreferrer">déclaration de confidentialité</a>.</p>
+            <p>Conformément au RGPD, vous pouvez exercer vos droits d'accès, de rectification et d'effacement à l'adresse de contact ci-dessus, ou introduire une réclamation auprès de la <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
+        </section>
+
+        <section id="liens">
+            <h2><span>7</span> Liens externes</h2>
+            <p>Ce site peut renvoyer vers des sites tiers (vidéos, wikis, forums). L'éditeur n'exerce aucun contrôle sur leur contenu et décline toute responsabilité à leur égard.</p>
+        </section>
+
+        <section id="responsabilite">
+            <h2><span>8</span> Responsabilité</h2>
+            <p>Les informations publiées sont fournies à titre indicatif, sans garantie d'exactitude, d'exhaustivité ou d'actualité. L'éditeur ne saurait être tenu responsable d'un dommage résultant de leur utilisation ou d'une indisponibilité du site.</p>
+        </section>
+
+        <section id="droit">
+            <h2><span>9</span> Droit applicable</h2>
+            <p>Les présentes mentions légales sont soumises au droit français. Tout litige relatif au site relève de la compétence des juridictions françaises.</p>
+        </section>
+
+        <p class="updated">Dernière mise à jour : 11 octobre 2026</p>
+    </main>
+
+    <div class="done-bar">
+        <a class="mc-btn" href="index.html">Terminé</a>
     </div>
 
-    <h3>3. Site non officiel — contenu de fan</h3>
-    <p>Ce site est une archive communautaire consacrée à des ARG (jeux en réalité alternée) et créations horrifiques inspirés de Minecraft. Il est réalisé par un fan et n'est <strong>ni affilié, ni approuvé, ni sponsorisé</strong> par Mojang Studios, Microsoft, ni par les auteurs des ARG, personnages, mods ou vidéos évoqués.</p>
-    <p>« Minecraft » est une marque déposée de Mojang Studios / Microsoft Corporation. Les personnages, récits, images, sons et autres éléments cités ou reproduits restent la propriété de leurs auteurs et ayants droit respectifs, et sont utilisés à des fins d'information et d'illustration dans un cadre non commercial.</p>
-    <p>Toute demande de retrait émanant d'un ayant droit sera traitée dans les meilleurs délais à l'adresse de contact ci-dessus.</p>
-
-    <h3>4. Nature des contenus</h3>
-    <p>Les récits, personnages et « archives » présentés relèvent de la <strong>fiction</strong>. Aucun élément de ce site ne doit être interprété comme la relation de faits réels. Certains contenus peuvent évoquer une ambiance horrifique et ne pas convenir à un jeune public sensible.</p>
-
-    <h3>5. Propriété intellectuelle</h3>
-    <p>Hors éléments appartenant à des tiers, les textes originaux, la mise en page et le code source de ce site sont la propriété de l'éditeur. Toute reproduction ou réutilisation, totale ou partielle, sans autorisation préalable est interdite.</p>
-
-    <h3>6. Données personnelles et cookies</h3>
-    <p>Ce site est entièrement statique : aucun formulaire, aucun compte utilisateur, <strong>aucun outil de mesure d'audience</strong> et <strong>aucun cookie</strong>. Aucune donnée personnelle n'est collectée directement par l'éditeur.</p>
-    <p>Pour des raisons techniques et de sécurité, GitHub peut enregistrer des données de connexion (adresse IP, date, page consultée) lors de l'affichage des pages. Ce traitement relève de GitHub, Inc. — voir sa <a href="https://docs.github.com/site-policy/privacy-policies/github-privacy-statement" target="_blank" rel="noopener noreferrer">déclaration de confidentialité</a>.</p>
-    <p>Conformément au RGPD, vous pouvez exercer vos droits d'accès, de rectification et d'effacement à l'adresse de contact ci-dessus, ou introduire une réclamation auprès de la <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">CNIL</a>.</p>
-
-    <h3>7. Liens externes</h3>
-    <p>Ce site peut renvoyer vers des sites tiers (vidéos, wikis, forums). L'éditeur n'exerce aucun contrôle sur leur contenu et décline toute responsabilité à leur égard.</p>
-
-    <h3>8. Responsabilité</h3>
-    <p>Les informations publiées sont fournies à titre indicatif, sans garantie d'exactitude, d'exhaustivité ou d'actualité. L'éditeur ne saurait être tenu responsable d'un dommage résultant de leur utilisation ou d'une indisponibilité du site.</p>
-
-    <h3>9. Droit applicable</h3>
-    <p>Les présentes mentions légales sont soumises au droit français. Tout litige relatif au site relève de la compétence des juridictions françaises.</p>
-
-    <p class="updated">Dernière mise à jour : 22 août 2026</p>
-
-</div>
-
-<a class="back" href="index.html">← Retour à l'accueil</a>
-
+    <script>
+        // Panorama qui tourne doucement derrière, flouté comme dans les menus du jeu
+        (function () {
+            var calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            var scene = document.getElementById("cubeScene");
+            var cube = document.getElementById("cube");
+            var yaw = 40, last = performance.now(), p = 0;
+            function fit() { p = innerHeight / 2 / Math.tan(75 * Math.PI / 360); scene.style.perspective = p + "px"; }
+            function frame(now) {
+                yaw = (yaw + (now - last) * 0.003) % 360;
+                last = now;
+                cube.style.transform = "translateZ(" + p + "px) rotateX(8deg) rotateY(" + yaw.toFixed(3) + "deg)";
+                if (!calm) requestAnimationFrame(frame);
+            }
+            fit();
+            addEventListener("resize", fit);
+            requestAnimationFrame(frame);
+        })();
+    </script>
 </body>
 </html>

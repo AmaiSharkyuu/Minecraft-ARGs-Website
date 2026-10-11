@@ -5,273 +5,756 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/png" href="Creator.png">
     <title>Archive - Creator</title>
+    <script>document.documentElement.classList.add("js");</script>
     <style>
         @font-face {
             font-family: 'Minecraftia';
             src: local('Minecraftia'), url('../../Minecraftia.woff') format('woff');
         }
-        html {
-            /* For Firefox */
-            scrollbar-width: none;
-            /* For Internet Explorer and Edge Legacy */
-            -ms-overflow-style: none;
-        }
 
-        /* For Chrome, Safari, Opera and recent Edge versions */
-        html::-webkit-scrollbar {
-            display: none;
+        html {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            scroll-behavior: smooth;
         }
+        html::-webkit-scrollbar { display: none; }
+
         :root {
-            --mc-panel: #222222;
-            --mc-panel-light: #3c3c3c;
-            --mc-panel-dark: #121212;
+            --mc-panel: #1c1c1c;
+            --mc-panel-light: #3a3a3a;
+            --mc-panel-dark: #0e0e0e;
+            --blood: #ff3b3b;
+            --blood-dark: #5a0000;
             --text-red: #ff5555;
             --text-gray: #aaaaaa;
             --text-white: #ffffff;
+            --gold: #ffff55;
         }
+
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Minecraftia', 'Courier New', monospace;
-            background-color: #0b0b0b;
-            background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url('../../netherrack.png');
-            background-size: 64px;
+            background-color: #060404;
+            background-image:
+                radial-gradient(ellipse at 50% 0%, rgba(120, 0, 0, 0.35), transparent 60%),
+                linear-gradient(rgba(0,0,0,0.93), rgba(0,0,0,0.93)),
+                url('../../netherrack.png');
+            background-size: 100% 100vh, auto, 64px;
+            background-repeat: no-repeat, repeat, repeat;
+            image-rendering: pixelated;
             color: #ffffff;
             margin: 0;
-            padding: 20px;
-            
+            overflow-x: hidden;
             -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
             user-select: none;
         }
 
-        img {
-            -webkit-user-drag: none;
-            user-drag: none;
+        img { -webkit-user-drag: none; user-drag: none; }
+
+        /* =========================================================
+           AMBIANCE : grain, vignette, lignes CRT (au-dessus de tout, non cliquables)
+           ========================================================= */
+        .fx-vignette, .fx-grain, .fx-scan {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 900;
+        }
+        .fx-vignette {
+            background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.85) 100%);
+        }
+        .fx-scan {
+            background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px);
+            mix-blend-mode: multiply;
+        }
+        .fx-grain {
+            opacity: 0.09;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            animation: grain 0.6s steps(4) infinite;
+        }
+        @keyframes grain {
+            0%   { transform: translate(0, 0); }
+            25%  { transform: translate(-30px, 20px); }
+            50%  { transform: translate(20px, -40px); }
+            75%  { transform: translate(-10px, 30px); }
+            100% { transform: translate(0, 0); }
         }
 
-        .mc-btn-back {
+        /* Flash rouge plein écran (easter egg) */
+        .fx-flash {
+            position: fixed;
+            inset: 0;
+            background: #ff0000;
+            mix-blend-mode: multiply;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 950;
+        }
+        .fx-flash.on { animation: flash 0.9s steps(1) both; }
+        @keyframes flash {
+            0%   { opacity: 0.8; }
+            10%  { opacity: 0; }
+            20%  { opacity: 0.6; }
+            35%  { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* Les yeux qui apparaissent dans le noir */
+        .eyes {
+            position: fixed;
+            z-index: 901;
+            pointer-events: none;
+            display: flex;
+            gap: 14px;
+            opacity: 0;
+        }
+        .eyes i {
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            box-shadow: 0 0 6px #ff0000, 0 0 16px #ff0000;
+        }
+        .eyes.on { animation: eyes 2.2s steps(1) both; }
+        @keyframes eyes {
+            0%   { opacity: 0; }
+            10%  { opacity: 1; }
+            55%  { opacity: 1; }
+            58%  { opacity: 0; }
+            62%  { opacity: 1; }
+            90%  { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* =========================================================
+           BARRE DE PROGRESSION façon barre d'XP
+           ========================================================= */
+        .xp {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            z-index: 800;
+            background: #000;
+            border-bottom: 2px solid #000;
+        }
+        .xp-fill {
+            height: 100%;
+            width: 0;
+            background:
+                repeating-linear-gradient(90deg, transparent 0 calc(5.55% - 2px), #000 calc(5.55% - 2px) 5.55%),
+                linear-gradient(#ff7a7a, #c80000 60%, #6a0000);
+            box-shadow: 0 0 10px #ff0000;
+        }
+        .xp-level {
+            position: fixed;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 800;
+            font-size: 14px;
+            color: var(--blood);
+            text-shadow: 2px 0 #000, -2px 0 #000, 0 2px #000, 0 -2px #000, 0 0 10px #ff0000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .xp-level.show { opacity: 1; }
+
+        /* =========================================================
+           BOUTON RETOUR
+           ========================================================= */
+        .mc-btn {
             display: inline-block;
-            background: #555555;
-            border: 3px solid #000000;
-            border-top-color: #ababab;
-            border-left-color: #ababab;
-            border-right-color: #353535;
-            border-bottom-color: #353535;
+            background: #555;
+            border: 3px solid #000;
+            box-shadow: inset 3px 3px 0 #ababab, inset -3px -3px 0 #353535;
             padding: 10px 20px;
             color: #e0e0e0;
             text-decoration: none;
-            font-size: 14px;
-            text-shadow: 2px 2px 0px #222;
-            margin-bottom: 30px;
+            font-size: 13px;
+            text-shadow: 2px 2px 0 #222;
             cursor: pointer;
         }
-
-        .mc-btn-back:hover {
+        .mc-btn:hover {
             background: #7a2222;
-            border-top-color: #ba5555;
-            border-left-color: #ba5555;
+            box-shadow: inset 3px 3px 0 #ba5555, inset -3px -3px 0 #3a0e0e;
             color: #fff;
         }
-
-        .wiki-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: var(--mc-panel);
-            border: 4px solid #000000;
-            box-shadow: inset 4px 4px 0px var(--mc-panel-light), 
-                        inset -4px -4px 0px var(--mc-panel-dark);
-            padding: 30px;
+        .back {
+            position: absolute;
+            top: 24px;
+            left: 20px;
+            z-index: 910;
         }
 
-        .wiki-title {
+        /* =========================================================
+           ÉCRAN TITRE
+           ========================================================= */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            overflow: hidden;
+            padding: 80px 16px 60px;
+        }
+        .hero-bg {
+            position: absolute;
+            inset: -6%;
+            background: url('Images/here.webp') center / cover no-repeat;
+            filter: saturate(1.3) contrast(1.15) brightness(0.55);
+            animation: pan 40s ease-in-out infinite alternate;
+        }
+        @keyframes pan {
+            from { transform: scale(1.05) translate(-2%, 1%); }
+            to   { transform: scale(1.15) translate(2%, -1%); }
+        }
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(to bottom, rgba(6,4,4,0.3) 0%, rgba(6,4,4,0.1) 40%, #060404 100%),
+                radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.75) 100%);
+        }
+        .hero > *:not(.hero-bg):not(.back) { position: relative; z-index: 2; }
+
+        .hero-tag {
+            font-size: 12px;
+            color: var(--text-gray);
+            letter-spacing: 4px;
+            text-shadow: 2px 2px 0 #000;
+            margin: 0 0 18px;
+        }
+        .hero-tag b { color: var(--blood); font-weight: normal; }
+
+        .logo-wrap { position: relative; display: inline-block; }
+
+        .logo {
+            position: relative;
+            margin: 0;
+            font-size: clamp(54px, 13vw, 150px);
+            line-height: 1.1;
+            font-weight: normal;
+            color: #ff4545;
+            letter-spacing: 2px;
+            text-shadow:
+                0 4px 0 #a00000,
+                0 8px 0 #700000,
+                0 12px 0 #400000,
+                0 16px 0 #1a0000,
+                0 0 60px rgba(255, 0, 0, 0.55);
+        }
+        /* Glitch : deux copies décalées qui sautent de temps en temps */
+        .logo::before, .logo::after {
+            content: attr(data-text);
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            text-shadow: none;
+        }
+        .logo::before { color: #00ffff; }
+        .logo::after  { color: #ff00ff; }
+        .logo.glitch::before { animation: glitch-a 0.35s steps(1) both; }
+        .logo.glitch::after  { animation: glitch-b 0.35s steps(1) both; }
+        @keyframes glitch-a {
+            0%   { opacity: 0.8; clip-path: inset(10% 0 70% 0); transform: translate(-8px, 0); }
+            30%  { clip-path: inset(60% 0 10% 0); transform: translate(6px, 0); }
+            60%  { clip-path: inset(30% 0 45% 0); transform: translate(-4px, 0); }
+            100% { opacity: 0; }
+        }
+        @keyframes glitch-b {
+            0%   { opacity: 0.8; clip-path: inset(70% 0 5% 0); transform: translate(8px, 0); }
+            40%  { clip-path: inset(15% 0 60% 0); transform: translate(-6px, 0); }
+            70%  { clip-path: inset(45% 0 30% 0); transform: translate(3px, 0); }
+            100% { opacity: 0; }
+        }
+
+        /* Texte jaune qui pulse, comme sur l'écran titre de Minecraft */
+        .splash {
+            position: absolute;
+            right: -6%;
+            bottom: 16%;
+            color: var(--gold);
+            font-size: clamp(11px, 1.8vw, 18px);
+            white-space: nowrap;
+            text-shadow: 2px 2px 0 #3f3f00;
+            transform: rotate(-18deg);
+            transform-origin: center;
+            animation: splash 0.45s ease-in-out infinite alternate;
+        }
+        @keyframes splash {
+            from { transform: rotate(-18deg) scale(0.92); }
+            to   { transform: rotate(-18deg) scale(1.04); }
+        }
+
+        .hero-sub {
+            margin: 34px 0 0;
+            font-size: 12px;
+            color: #cfcfcf;
+            text-shadow: 2px 2px 0 #000;
+            min-height: 1.6em;
+        }
+        .hero-sub .caret {
+            display: inline-block;
+            width: 8px;
+            background: var(--blood);
+            animation: caret 0.8s steps(1) infinite;
+        }
+        @keyframes caret { 50% { opacity: 0; } }
+
+        .hero-cta {
+            margin-top: 40px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 0 #000;
+            animation: bob 1.6s ease-in-out infinite;
+        }
+        .hero-cta:hover { color: var(--blood); }
+        @keyframes bob { 50% { transform: translateY(6px); } }
+
+        /* =========================================================
+           MISE EN PAGE GÉNÉRALE
+           ========================================================= */
+        .page {
+            max-width: 1040px;
+            margin: 0 auto;
+            padding: 0 16px 60px;
+        }
+
+        .panel {
+            background: var(--mc-panel);
+            border: 4px solid #000;
+            box-shadow: inset 4px 4px 0 var(--mc-panel-light), inset -4px -4px 0 var(--mc-panel-dark);
+        }
+
+        .label {
+            font-size: 11px;
             color: var(--text-red);
-            font-size: 24px;
-            /* Effet Glow Rouge sur le titre principal */
-            text-shadow: 0 0 4px #ff555575, 0 0 12px #ff0000, 2px 2px 0px #222;
-            border-bottom: 4px solid #000000;
-            padding-bottom: 15px;
-            margin-top: 0;
+            letter-spacing: 2px;
+            text-shadow: 0 0 6px #ff0000, 1px 1px 0 #000;
+            margin: 0 0 12px;
+        }
+
+        /* =========================================================
+           VIDÉO LIÉE / CRÉDITS (ce n'est pas ma vidéo)
+           ========================================================= */
+        .credits {
+            margin-top: -40px;
+            position: relative;
+            z-index: 5;
+            padding: 24px;
+        }
+        .credits-title {
+            margin: 0 0 6px;
+            font-weight: normal;
+            font-size: clamp(22px, 4.5vw, 38px);
+            line-height: 1.3;
+            color: #fff;
+            text-shadow: 3px 3px 0 #3f0000, 0 0 24px rgba(255, 0, 0, 0.35);
+        }
+        .credits-by {
+            margin: 0 0 18px;
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+        .credits-by a { color: var(--text-red); text-decoration: none; }
+        .credits-by a:hover { text-shadow: 0 0 6px #ff0000; }
+        .tape {
+            background: #0b0b0b;
+            border: 4px solid #000;
+            box-shadow: inset 2px 2px 0 #252525;
+            padding: 14px;
+        }
+        .tape-head {
+            font-size: 11px;
             margin-bottom: 10px;
         }
-
-        .wiki-subtitle {
-            color: var(--text-gray);
-            font-size: 12px;
-            margin-bottom: 20px;
-            text-transform: uppercase;
+        .rec { color: var(--blood); }
+        .rec::before {
+            content: "";
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #ff0000;
+            margin-right: 6px;
+            box-shadow: 0 0 8px #ff0000;
+            animation: caret 1s steps(1) infinite;
         }
-
-        /* --- YOUTUBE EMBED --- */
-        .video-credits-box {
-            background: #141414;
-            border: 4px solid #000000;
-            box-shadow: inset 2px 2px 0px #252525;
-            padding: 15px;
-            margin-bottom: 35px;
-        }
-
-        .video-title-label {
-            color: var(--text-red);
-            font-size: 12px;
-            margin: 0 0 10px 0;
-            text-shadow: 0 0 4px #ff5555, 1px 1px 0px #000;
-        }
-
         .video-wrapper {
             position: relative;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
+            aspect-ratio: 16 / 9;
             border: 2px solid #373737;
+            background: #000;
         }
+        .video-wrapper iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
-        .video-wrapper iframe {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        /* =========================================================
+           CHAPITRES (jours / nuits)
+           ========================================================= */
+        .chapter {
+            position: relative;
+            margin-top: 70px;
+            counter-reset: none;
         }
-
-        /* --- LOG ENTRIES --- */
-        .wiki-entries {
+        .chapter-head {
             display: flex;
-            flex-direction: column;
-            gap: 25px;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 28px;
         }
-
-        .wiki-row {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 20px;
-            background: #181818;
-            border: 4px solid #000000;
-            box-shadow: inset 2px 2px 0px #252525;
-            padding: 15px;
+        .celestial {
+            width: 44px;
+            height: 44px;
+            flex-shrink: 0;
+            border: 4px solid #000;
         }
-
-        @media (max-width: 768px) {
-            .wiki-row { grid-template-columns: 1fr; }
+        .sun  { background: #ffea70; box-shadow: inset -6px -6px 0 #f5b800, 0 0 30px rgba(255, 220, 80, 0.5); }
+        .moon {
+            background: #d8dce8;
+            box-shadow: inset -6px -6px 0 #8f95a8, 0 0 30px rgba(180, 200, 255, 0.35);
+            background-image:
+                linear-gradient(#9aa0b3, #9aa0b3), linear-gradient(#9aa0b3, #9aa0b3), linear-gradient(#9aa0b3, #9aa0b3);
+            background-size: 8px 8px, 6px 6px, 4px 4px;
+            background-position: 8px 8px, 22px 18px, 12px 24px;
+            background-repeat: no-repeat;
         }
-
-        .mc-image-slot.inline-slot {
-            display: flex;
-            flex-direction: row;
-            gap: 16px;
-            align-items: flex-start;
-            width: 100%;
-            box-sizing: border-box;
-            align-self: stretch;
+        .chapter-title { margin: 0; font-weight: normal; }
+        .chapter-title small {
+            display: block;
+            font-size: 11px;
+            color: var(--text-gray);
+            letter-spacing: 3px;
+            margin-bottom: 4px;
         }
-
-        .mc-image-slot.inline-slot > div {
-            display: flex;
-            flex-direction: column;
+        .chapter-title span {
+            font-size: clamp(22px, 4vw, 34px);
+            color: #fff;
+            text-shadow: 3px 3px 0 #3f0000;
+        }
+        .chapter-rule {
             flex: 1;
-            min-width: 0;
+            height: 4px;
+            background: repeating-linear-gradient(90deg, #3a0000 0 12px, transparent 12px 20px);
         }
 
-        .mc-image-slot.inline-slot .file-name {
-            word-break: normal;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: left;
+        /* Les nuits sont plus froides et étoilées */
+        .chapter.night::before {
+            content: "";
+            position: absolute;
+            inset: -30px -40px;
+            background:
+                radial-gradient(1px 1px at 10% 20%, #fff, transparent),
+                radial-gradient(1px 1px at 70% 10%, #fff, transparent),
+                radial-gradient(2px 2px at 40% 60%, #cfd8ff, transparent),
+                radial-gradient(1px 1px at 85% 75%, #fff, transparent),
+                radial-gradient(1px 1px at 25% 85%, #fff, transparent),
+                linear-gradient(rgba(10, 14, 40, 0.55), rgba(10, 14, 40, 0.25));
+            pointer-events: none;
+            z-index: -1;
+        }
+        .chapter.night .chapter-title span { text-shadow: 3px 3px 0 #0a0e28; }
+        .chapter.night .wiki-row { background: #0f1120; }
+
+        /* La ligne du temps à gauche */
+        .wiki-entries {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 26px;
+            padding-left: 34px;
+            counter-reset: none;
+        }
+        .wiki-entries::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(#5a0000, #1a0000);
+        }
+
+        /* =========================================================
+           ENTRÉES DU JOURNAL
+           ========================================================= */
+        body { counter-reset: log; }
+
+        .wiki-row, .mc-image-slot.inline-slot {
+            position: relative;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 22px;
+            background: #141212;
+            border: 4px solid #000;
+            box-shadow: inset 2px 2px 0 #2a2525, inset -2px -2px 0 #0a0a0a;
+            padding: 16px;
+            counter-increment: log;
+        }
+        /* Le petit carré sur la ligne du temps */
+        .wiki-row::before, .mc-image-slot.inline-slot::before {
+            content: "";
+            position: absolute;
+            left: -36px;
+            top: 22px;
+            width: 12px;
+            height: 12px;
+            background: #ff2020;
+            border: 3px solid #000;
+            box-shadow: 0 0 10px #ff0000;
+        }
+        .wiki-row.text-only { grid-template-columns: 1fr; }
+        .wiki-row.wide { grid-template-columns: 1fr; padding: 10px; }
+
+        @media (max-width: 820px) {
+            .wiki-row, .mc-image-slot.inline-slot { grid-template-columns: 1fr; }
         }
 
         .mc-image-slot {
-            background: #0a0a0a;
-            border: 4px solid #373737;
-            border-top-color: #1a1a1a;
-            border-left-color: #1a1a1a;
-            border-right-color: #4a4a4a;
-            border-bottom-color: #4a4a4a;
-            padding: 8px;
+            align-self: start;
+        }
+        .wiki-row > .mc-image-slot {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            align-self: start; 
+            gap: 10px;
         }
 
+        /* Image : survol = ça grésille */
         .img-popup-link {
+            position: relative;
             display: block;
             cursor: zoom-in;
+            overflow: hidden;
+            border: 3px solid #000;
+            background: #000;
         }
-
-        .mc-image-slot img {
+        .img-popup-link img {
+            display: block;
             width: 100%;
             height: auto;
-            display: block;
-            image-rendering: auto; 
-            border: 2px solid #000;
+            transition: transform 0.4s ease, filter 0.4s ease;
         }
+        .img-popup-link::after {
+            content: "[ INSPECT ]";
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: flex-end;
+            justify-content: flex-end;
+            padding: 8px;
+            font-size: 10px;
+            color: #fff;
+            text-shadow: 1px 1px 0 #000;
+            background: repeating-linear-gradient(to bottom, rgba(255,0,0,0.08) 0 2px, transparent 2px 4px);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .img-popup-link:hover img {
+            transform: scale(1.04);
+            filter: contrast(1.15) saturate(1.3) drop-shadow(3px 0 0 rgba(255,0,0,0.6)) drop-shadow(-3px 0 0 rgba(0,255,255,0.35));
+        }
+        .img-popup-link:hover::after { opacity: 1; }
 
         .file-name {
             font-size: 11px;
             color: var(--text-red);
-            margin: 8px 0 0 0;
-            text-shadow: 1px 1px 0px #3f0000;
+            margin: 0;
+            text-shadow: 1px 1px 0 #3f0000;
             word-break: break-all;
         }
 
+        /* Pages du livre README posées en éventail */
+        .mc-image-slot.inline-slot {
+            grid-template-columns: repeat(3, 1fr);
+            padding: 38px 24px 22px;
+            background: #1a120a;
+        }
+        .mc-image-slot.inline-slot::after {
+            content: "README.book";
+            position: absolute;
+            top: 8px;
+            left: 16px;
+            font-size: 10px;
+            color: #c9a96b;
+            letter-spacing: 2px;
+        }
+        .mc-image-slot.inline-slot > div {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            transition: transform 0.3s ease;
+        }
+        .mc-image-slot.inline-slot > div:nth-child(1) { transform: rotate(-3deg); }
+        .mc-image-slot.inline-slot > div:nth-child(2) { transform: rotate(1.5deg) translateY(6px); }
+        .mc-image-slot.inline-slot > div:nth-child(3) { transform: rotate(4deg); }
+        .mc-image-slot.inline-slot > div:hover { transform: rotate(0) scale(1.06); z-index: 2; }
+        .mc-image-slot.inline-slot .file-name { color: #c9a96b; text-shadow: 1px 1px 0 #000; }
+
+        /* Colonne de texte : le titre de l'entrée passe en haut */
         .text-slot {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            padding: 10px;
+            min-width: 0;
+        }
+        .context-note {
+            order: -1;
+            margin: 0 0 14px;
+            font-size: 16px;
+            color: #fff;
+            text-shadow: 2px 2px 0 #3f0000;
+        }
+        .context-note::before {
+            content: "LOG " counter(log, decimal-leading-zero);
+            display: block;
+            font-size: 10px;
+            color: var(--text-red);
+            letter-spacing: 2px;
+            margin-bottom: 4px;
         }
 
-        /* --- COLLAPSIBLE DIALOGUES --- */
+        /* =========================================================
+           DIALOGUES : style chat Minecraft
+           ========================================================= */
         .mc-dropdown summary {
             list-style: none;
             cursor: pointer;
             outline: none;
         }
-        
-        .mc-dropdown summary::-webkit-details-marker {
-            display: none; 
-        }
-
-        .mc-dropdown summary:hover .quote-title {
-            color: var(--text-red); 
-            text-shadow: 0 0 4px #ff5555;
-        }
+        .mc-dropdown summary::-webkit-details-marker { display: none; }
 
         .quote-title {
-            color: var(--text-white);
-            font-size: 12px;
-            margin: 0;
-            text-shadow: 1px 1px 0px #111;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            color: #e0e0e0;
+            background: #3c3c3c;
+            border: 2px solid #000;
+            box-shadow: inset 2px 2px 0 #6a6a6a, inset -2px -2px 0 #1e1e1e;
+            padding: 6px 12px;
+            text-shadow: 1px 1px 0 #000;
         }
-
+        .mc-dropdown summary:hover .quote-title {
+            background: #6a1d1d;
+            box-shadow: inset 2px 2px 0 #b04a4a, inset -2px -2px 0 #2a0808;
+            color: #fff;
+        }
+        .quote-title .count { color: var(--text-gray); }
         .dropdown-arrow {
             display: inline-block;
-            font-size: 10px;
-            margin-right: 6px;
+            font-size: 9px;
             transition: transform 0.15s ease-in-out;
-            color: var(--text-gray);
         }
-
-        .mc-dropdown[open] .dropdown-arrow {
-            transform: rotate(90deg);
-            color: var(--text-red);
-            text-shadow: 0 0 4px #ff5555;
-        }
+        .mc-dropdown[open] .dropdown-arrow { transform: rotate(90deg); color: var(--blood); }
 
         .quote-text {
-            font-size: 14px;
-            line-height: 1.6;
-            color: #ffffff;
-            margin: 10px 0 0 0;
-            text-shadow: 1px 1px 0px #111;
-            font-style: italic;
-            padding-left: 12px;
-            border-left: 2px solid #444;
+            margin: 12px 0 0;
+            background: rgba(0, 0, 0, 0.55);
+            border-left: 3px solid #3a0000;
+            padding: 10px 12px;
+            font-size: 13px;
+            line-height: 1.75;
+            max-height: 460px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #5a0000 #000;
         }
 
-        /* --- EXTRAITS AUDIO (bouton ▶ PLAY + mini-lecteur) --- */
+        .quote-text p { margin: 0 0 4px; }
+        .quote-text .msg { color: #f2f2f2; }
+
+        /* Petite tête de joueur devant chaque réplique (tirée du skin : visage + calque du chapeau) */
+        .char-creator, .char-twixxel, .char-thatmob, .char-idaios {
+            position: relative;
+            padding-left: 24px;
+            font-style: normal;
+        }
+        .char-creator::before, .char-twixxel::before, .char-thatmob::before, .char-idaios::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0.3em;
+            width: 16px;
+            height: 16px;
+            image-rendering: pixelated;
+            box-shadow: 0 0 0 1px #000;
+        }
+        .char-twixxel::before { background: url('Skins/Twixxel.png') -80px -16px / 128px 128px, url('Skins/Twixxel.png') -16px -16px / 128px 128px; }
+        .char-thatmob::before { background: url('Skins/Thatmob.png') -80px -16px / 128px 128px, url('Skins/Thatmob.png') -16px -16px / 128px 128px; }
+        .char-idaios::before  { background: url('Skins/Idaios.png') -80px -16px / 128px 128px, url('Skins/Idaios.png') -16px -16px / 128px 128px; }
+        .char-creator::before {
+            background: url('Creator.png') 63% 51% / 56px 56px no-repeat;
+            image-rendering: auto;
+            box-shadow: 0 0 0 1px #000, 0 0 6px #ff0000;
+        }
+
+        .name { margin-right: 4px; }
+        .char-twixxel .name { color: #55ffff; text-shadow: 1px 1px 0 #003f3f; }
+        .char-thatmob .name { color: #ffaa00; text-shadow: 1px 1px 0 #3f2a00; }
+        .char-idaios  .name { color: #55ff55; text-shadow: 1px 1px 0 #153f15; }
+
+        /* Creator : ni gentil ni méchant, sa lueur hésite entre le rouge et l'or, et il tremble */
+        .char-creator, .char-creator .msg, .char-creator .name {
+            color: #ff6b6b;
+            text-shadow: 0 0 4px #ff0000, 0 0 10px #ff0000;
+            animation: creator-doute 6s ease-in-out infinite;
+        }
+        .char-creator { display: block; }
+        .char-creator .msg { display: inline-block; animation: creator-doute 6s ease-in-out infinite, shiver 3s steps(1) infinite; }
+        @keyframes creator-doute {
+            0%, 100% { color: #ff6b6b; text-shadow: 0 0 4px #ff0000, 0 0 10px #ff0000; }
+            50%      { color: #ffd966; text-shadow: 0 0 4px #ffaa00, 0 0 10px #ffaa00; }
+        }
+        @keyframes shiver {
+            0%, 92%, 100% { transform: none; }
+            94% { transform: translate(1px, -1px); }
+            96% { transform: translate(-1px, 1px); }
+            98% { transform: translate(1px, 0); }
+        }
+
+        .action {
+            color: #9a9a9a;
+            font-style: italic;
+            padding-left: 20px;
+        }
+        .action::before { content: "* "; color: #5a5a5a; }
+
+        /* Les pages de livre lues dans les dialogues */
+        .book {
+            margin: 0 !important;
+            background: #e9dcb6;
+            color: #3a2a14;
+            padding: 2px 14px;
+            border-left: 4px solid #b89a60;
+            border-right: 4px solid #b89a60;
+            text-shadow: none;
+        }
+        .book .name { display: none; }
+        .book .msg { color: #3a2a14; }
+
+        /* Timestamps : à quel moment de la vidéo se passe chaque scène (simple indication) */
+        .ts {
+            align-self: flex-start;
+            font-size: 10px;
+            color: #ffb0b0;
+            background: rgba(120, 16, 16, 0.35);
+            border: 2px solid #3a0606;
+            padding: 2px 8px;
+            margin: -6px 0 12px;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 0 #000;
+        }
+        .ts b { color: #fff; font-weight: normal; }
+        .mc-image-slot.inline-slot .ts { position: absolute; top: 6px; right: 12px; margin: 0; z-index: 3; }
+
+        /* Boutons ▶ PLAY */
         .yt-clip {
             font-family: inherit;
             font-size: 10px;
@@ -286,11 +769,7 @@
             vertical-align: middle;
             text-shadow: 1px 1px 0 #000;
         }
-
-        .yt-clip:hover {
-            color: var(--text-red);
-            text-shadow: 0 0 4px #ff5555;
-        }
+        .yt-clip:hover { color: var(--text-red); text-shadow: 0 0 4px #ff5555; }
 
         .yt-clip-player {
             position: fixed;
@@ -301,35 +780,19 @@
             max-width: calc(100% - 32px);
             background: var(--mc-panel);
             border: 4px solid #000;
-            box-shadow: inset 4px 4px 0 var(--mc-panel-light),
-                        inset -4px -4px 0 var(--mc-panel-dark);
+            box-shadow: inset 4px 4px 0 var(--mc-panel-light), inset -4px -4px 0 var(--mc-panel-dark);
             padding: 8px;
             cursor: pointer;
             animation: dlg-static 0.4s linear both;
         }
+        .yt-clip-player .file-name { margin: 0 0 6px 0; }
+        .yt-clip-frame { aspect-ratio: 16 / 9; border: 2px solid #000; background: #000; }
+        .yt-clip-frame iframe { width: 100%; height: 100%; display: block; border: 0; }
 
-        .yt-clip-player .file-name {
-            margin: 0 0 6px 0;
-            font-size: 11px;
-        }
-
-        .yt-clip-frame {
-            aspect-ratio: 16 / 9;
-            border: 2px solid #000;
-            background: #000;
-        }
-
-        .yt-clip-frame iframe {
-            width: 100%;
-            height: 100%;
-            display: block;
-            border: 0;
-        }
-
-        /* --- ANIMATIONS DES DIALOGUES (une au hasard à chaque ouverture/fermeture) --- */
+        /* =========================================================
+           ANIMATIONS DES DIALOGUES (une au hasard)
+           ========================================================= */
         .quote-text.anim-out { animation-direction: reverse !important; }
-
-        /* Glitch : le texte apparaît par tranches qui sautent */
         .quote-text.anim-glitch { animation: dlg-glitch 0.5s steps(1) both; }
         @keyframes dlg-glitch {
             0%   { opacity: 0; clip-path: inset(0 0 100% 0); }
@@ -341,15 +804,11 @@
             75%  { clip-path: inset(0); transform: translateX(-2px); }
             100% { opacity: 1; clip-path: inset(0); transform: none; filter: none; }
         }
-
-        /* Scan : balayage d'écran cathodique de haut en bas */
         .quote-text.anim-scan { animation: dlg-scan 0.45s linear both; }
         @keyframes dlg-scan {
-            0%   { clip-path: inset(0 0 100% 0); filter: brightness(3); border-left-color: #ff0000; }
-            100% { clip-path: inset(0 0 0 0); filter: brightness(1); border-left-color: #444; }
+            0%   { clip-path: inset(0 0 100% 0); filter: brightness(3); }
+            100% { clip-path: inset(0 0 0 0); filter: brightness(1); }
         }
-
-        /* Parasites : flou et grésillement */
         .quote-text.anim-static { animation: dlg-static 0.5s linear both; }
         @keyframes dlg-static {
             0%   { opacity: 0; filter: blur(6px) contrast(3); }
@@ -359,8 +818,6 @@
             60%  { opacity: 0.3; }
             100% { opacity: 1; filter: none; }
         }
-
-        /* Lampe qui grésille */
         .quote-text.anim-flicker { animation: dlg-flicker 0.6s steps(1) both; }
         @keyframes dlg-flicker {
             0%   { opacity: 0; }
@@ -373,751 +830,1204 @@
             70%  { opacity: 1; filter: none; }
             100% { opacity: 1; }
         }
-
-        /* Lignes : chaque réplique arrive l'une après l'autre (délais posés en JS) */
         @keyframes dlg-line {
             0%   { opacity: 0; transform: translateX(-12px); }
             100% { opacity: 1; transform: none; }
         }
 
-        .context-note {
-            font-size: 11px;
-            color: #777;
-            margin-top: 15px;
-            border-top: 1px dashed #333;
-            padding-top: 5px;
+        /* Apparition des entrées au défilement (lampe qui s'allume) */
+        .js .reveal { opacity: 0; }
+        .js .reveal.seen { animation: power-on 0.7s steps(1) both; }
+        @keyframes power-on {
+            0%   { opacity: 0; }
+            15%  { opacity: 0.6; }
+            25%  { opacity: 0.1; }
+            45%  { opacity: 0.9; }
+            55%  { opacity: 0.4; }
+            100% { opacity: 1; }
         }
 
-        /* --- EPISODE DIVIDER --- */
-        .episode-divider {
+        /* =========================================================
+           FIN : fichier pas encore récupéré
+           ========================================================= */
+        .corrupt {
+            position: relative;
+            margin-top: 70px;
+            padding: 50px 20px;
             text-align: center;
-            border-top: 2px dashed #444;
-            border-bottom: 2px dashed #444;
-            padding: 20px 0;
-            margin: 40px 0 20px 0;
-            color: var(--text-gray);
-            font-size: 14px;
-            letter-spacing: 2px;
-            text-shadow: 1px 1px 0px #000;
-            background: #141414;
+            border: 4px solid #000;
+            overflow: hidden;
+            background: #0a0a0a;
         }
+        .corrupt::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0.25;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='turbulence' baseFrequency='1.2' numOctaves='1'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            animation: grain 0.3s steps(3) infinite;
+        }
+        .corrupt p { position: relative; margin: 0; }
+        .corrupt .big { font-size: clamp(16px, 3vw, 24px); color: var(--blood); text-shadow: 0 0 10px #ff0000, 2px 2px 0 #000; }
+        .corrupt .small { margin-top: 14px; font-size: 11px; color: var(--text-gray); }
 
-        /* --- SYSTEM LIGHTBOX --- */
+        /* =========================================================
+           LIGHTBOX
+           ========================================================= */
         .lightbox {
             display: none;
             position: fixed;
             z-index: 999;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.92);
             align-items: center;
             justify-content: center;
-            cursor: zoom-out;
-            overflow: auto;
             padding: 20px;
-            box-sizing: border-box;
+            cursor: zoom-out;
         }
-
-        .lightbox:target,
-        .lightbox.open {
-            display: flex;
-        }
-
+        .lightbox.open { display: flex; }
         .lightbox-content {
+            position: relative;
             background: var(--mc-panel);
-            border: 4px solid #000000;
-            box-shadow: inset 4px 4px 0px var(--mc-panel-light), 
-                        inset -4px -4px 0px var(--mc-panel-dark);
+            border: 4px solid #000;
+            box-shadow: inset 4px 4px 0 var(--mc-panel-light), inset -4px -4px 0 var(--mc-panel-dark);
             padding: 12px;
-            max-width: 95%;
-            box-sizing: border-box;
-            margin: auto;
+            max-width: min(1200px, 95vw);
+            animation: dlg-glitch 0.45s steps(1) both;
         }
-
         .lightbox-content img {
-            max-width: 100%;
-            height: auto;
             display: block;
+            max-width: 100%;
+            max-height: 78vh;
+            margin: 0 auto;
             border: 3px solid #000;
             cursor: default;
         }
-
-        /* --- CHARACTER DESIGN STYLES --- */
-        /* Couleurs du chat Minecraft, une par personnage */
-        .char-creator,
-        .char-twixxel,
-        .char-thatmob,
-        .char-idaios {
-            margin: 0 0 5px 0;
-            font-style: normal;
+        .lightbox-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
         }
-
-        /* Creator : ni gentil ni méchant, sa lueur hésite entre le rouge et l'or */
-        .char-creator {
-            color: #ff6b6b;
-            text-shadow: 0 0 4px #ff0000, 0 0 10px #ff0000;
-            animation: creator-doute 6s ease-in-out infinite;
+        .lightbox-bar .file-name { flex: 1; text-align: center; }
+        .lightbox-bar button {
+            font-family: inherit;
+            font-size: 12px;
+            color: #e0e0e0;
+            background: #555;
+            border: 2px solid #000;
+            box-shadow: inset 2px 2px 0 #ababab, inset -2px -2px 0 #353535;
+            padding: 4px 12px;
+            cursor: pointer;
         }
+        .lightbox-bar button:hover { background: #7a2222; }
 
-        @keyframes creator-doute {
-            0%, 100% { color: #ff6b6b; text-shadow: 0 0 4px #ff0000, 0 0 10px #ff0000; }
-            50%      { color: #ffd966; text-shadow: 0 0 4px #ffaa00, 0 0 10px #ffaa00; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .char-creator { animation: none; }
-        }
-
-        /* Twixxel : le héros, cyan vif, à l'opposé du rouge de Creator */
-        .char-twixxel {
-            color: #55ffff;
-            text-shadow: 1px 1px 0 #003f3f;
-        }
-
-        .char-thatmob {
-            color: #ffaa00;
-            text-shadow: 1px 1px 0 #3f2a00;
-        }
-
-        .char-idaios {
-            color: #55ff55;
-            text-shadow: 1px 1px 0 #153f15;
-        }
-
-        .action {
-            margin: 0;
-            color: var(--text-gray);
-            font-style: italic;
-        }
-
-        .wiki-row.stacked-layout {
+        /* =========================================================
+           SUCCÈS (advancements) et chat en bas à gauche
+           ========================================================= */
+        .toasts {
+            position: fixed;
+            top: 24px;
+            right: 16px;
+            z-index: 960;
             display: flex;
             flex-direction: column;
+            gap: 8px;
+            pointer-events: none;
+        }
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 300px;
+            max-width: calc(100vw - 32px);
+            background: #212121;
+            border: 4px solid #000;
+            box-shadow: inset 3px 3px 0 #555, inset -3px -3px 0 #111;
+            padding: 10px 12px;
+            animation: toast-in 0.4s ease-out both, toast-in 0.4s ease-in 4.2s reverse forwards;
+        }
+        @keyframes toast-in {
+            from { transform: translateX(120%); }
+            to   { transform: none; }
+        }
+        .toast img { width: 32px; height: 32px; image-rendering: pixelated; border: 2px solid #000; }
+        .toast p { margin: 0; font-size: 11px; line-height: 1.6; }
+        .toast .t1 { color: var(--gold); }
+        .toast .t2 { color: #fff; }
+
+        .chat-toast {
+            position: fixed;
+            left: 16px;
+            bottom: 60px;
+            z-index: 960;
+            max-width: calc(100vw - 32px);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 4px 10px;
+            font-size: 14px;
+            pointer-events: none;
+            animation: chat-fade 6s linear both;
+        }
+        @keyframes chat-fade {
+            0%, 85% { opacity: 1; }
+            100%    { opacity: 0; }
+        }
+
+        footer {
+            max-width: 700px;
+            margin: 0 auto 50px;
+            padding: 16px;
+            text-align: center;
+            font-size: 11px;
+            border-top: 4px solid #000;
+        }
+        footer a { color: #aaaaaa; text-decoration: none; }
+        footer a:hover { color: var(--blood); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+            .js .reveal { opacity: 1; }
         }
     </style>
 </head>
 <body>
 
-    <a href="../../" class="mc-btn-back">< BACK TO MENU</a>
+    <div class="fx-vignette"></div>
+    <div class="fx-scan"></div>
+    <div class="fx-grain"></div>
+    <div class="fx-flash" id="flash"></div>
+    <div class="eyes" id="eyes"><i></i><i></i></div>
 
-    <div class="wiki-container">
-        
-        <h1 class="wiki-title">Entity_File: Creator</h1>
-        <p class="wiki-subtitle">Recovered from /.minecraft/saves/New World/level.dat</p>
-        
-        <div class="episode-divider">
-            [ Something is Already Here... ]
+    <div class="xp"><div class="xp-fill" id="xpFill"></div></div>
+    <div class="xp-level" id="xpLevel">DAY 1</div>
+
+    <!-- ===================== ÉCRAN TITRE ===================== -->
+    <header class="hero">
+        <div class="hero-bg"></div>
+        <a href="../../" class="mc-btn back">&lt; BACK TO MENU</a>
+
+        <p class="hero-tag">ENTITY_FILE <b>#002</b> &middot; STATUS: <b>ACTIVE</b></p>
+        <div class="logo-wrap">
+            <h1 class="logo" id="logo" data-text="CREATOR">CREATOR</h1>
+            <span class="splash" id="splash">Do not ask it questions!</span>
         </div>
+        <p class="hero-sub"><span id="typed"></span><span class="caret">&nbsp;</span></p>
+        <a href="#file" class="hero-cta">&#9660; OPEN THE FILE &#9660;</a>
+    </header>
 
-        <div class="video-credits-box">
-            <p class="video-title-label">[ RELATED VIDEO / CREDITS ]</p>
-            <div class="video-wrapper">
-                <iframe 
-                    src="https://www.youtube.com/embed/6MkxADy0wAs" 
-                    title="YouTube video player" 
-                    frameborder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                    allowfullscreen>
-                </iframe>
-            </div>
-        </div>
+    <main class="page" id="file">
 
-        <div class="wiki-entries">
-            <div class="wiki-row" style="grid-template-columns: 1fr;">
-                <div class="mc-image-slot">
-                    <a href="#here" class="img-popup-link">
-                        <img src="../Creator/Images/here.webp" alt="Here">
-                    </a>
-                    <p class="file-name">> here.webp</p>
-                </div>
-            </div>
-            <div class="wiki-row" style="grid-template-columns: 1fr;">
-                <div class="mc-image-slot">
-                    <a href="#Ungrateful" class="img-popup-link">
-                        <img src="../Creator/Images/Ungrateful.webp" alt="Ungrateful">
-                    </a>
-                    <p class="file-name">> Ungrateful.webp</p>
+        <!-- ===================== VIDÉO LIÉE / CRÉDITS ===================== -->
+        <section class="panel credits reveal">
+            <p class="label">[ RELATED VIDEO / CREDITS ]</p>
+            <h2 class="credits-title">Something is Already Here...</h2>
+            <p class="credits-by">Original video by <a href="https://www.youtube.com/watch?v=6MkxADy0wAs" target="_blank" rel="noopener">Twixxel</a> on YouTube. All credits go to him.</p>
+            <div class="tape">
+                <div class="tape-head"><span class="rec">REC &middot; TAPE_01</span></div>
+                <div class="video-wrapper">
+                    <iframe
+                        src="https://www.youtube.com/embed/6MkxADy0wAs"
+                        title="Something is Already Here..."
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen>
+                    </iframe>
                 </div>
             </div>
-            
-            <div class="wiki-row"> 
-                <div class="text-slot">
-                    <details class="mc-dropdown" open> 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-thatmob">&lt;Thatmob&gt; Alright!</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Let's go dude</p>
-                            <p class="action">* Twixxel sees a Huge figure in the distance *</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I just saw something</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; What? Dude come on we don't got that much time left. It's fine. It's probably just your vision.</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Nah, ignore it Twixxel. Come on.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; It's fine, It's fine, you're right. come on. </p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; i'mma do a little cave base.</p>
-                            <p class="char-idaios">&lt;Idaios&gt; I'mma help you with that.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright then, I will get some oak logs then. </p>
-                        </div>
-                    </details>
-                    <p class="context-note">Brand New World</p>
-                </div>
+        </section>
+
+        <!-- ===================== JOUR 1 ===================== -->
+        <section class="chapter" data-day="DAY 1">
+            <div class="chapter-head reveal">
+                <div class="celestial sun"></div>
+                <h2 class="chapter-title"><small>CHAPTER I</small><span>Day 1 &middot; Brand New World</span></h2>
+                <div class="chapter-rule"></div>
             </div>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#Chest" class="img-popup-link">
-                        <img src="../Creator/Images/Chest.webp" alt="Chest Image">
-                    </a>
-                    <p class="file-name">> Chest.webp</p>
+            <div class="wiki-entries">
+                <div class="wiki-row wide">
+                    <div class="mc-image-slot">
+                        <a href="#here" class="img-popup-link">
+                            <img src="Images/here.webp" alt="Here">
+                        </a>
+                        <p class="file-name">&gt; here.webp</p>
+                    </div>
                 </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown"> 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; They're doing the little cave base. uhh I just found this random chest, though.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Why is there a redstone?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh it's a bonus chest! Alright that makes sense.</p>
-                            <p class="action">Twixxel Opens the chest and finds a book named 'README'</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; okay um... read me</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Read me...</p>
-                            <p class="action">Twixxel starts reading the book.</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Bonus Chest</p>
+                <div class="wiki-row wide">
+                    <div class="mc-image-slot">
+                        <a href="#Ungrateful" class="img-popup-link">
+                            <img src="Images/Ungrateful.webp" alt="Ungrateful">
+                        </a>
+                        <p class="file-name">&gt; Ungrateful.webp</p>
+                    </div>
+                </div>
+
+                <div data-time="39" class="wiki-row text-only">
+                    <div class="text-slot">
+                        <details class="mc-dropdown" open>
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-thatmob">&lt;Thatmob&gt; Alright!</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Let's go dude</p>
+                                <p class="action">Twixxel sees a Huge figure in the distance</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I just saw something</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; What? Dude come on we don't got that much time left. It's fine. It's probably just your vision.</p>
+                                <p class="char-idaios">&lt;Idaios&gt; Nah, ignore it Twixxel. Come on.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; It's fine, It's fine, you're right. come on. </p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; i'mma do a little cave base.</p>
+                                <p class="char-idaios">&lt;Idaios&gt; I'mma help you with that.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright then, I will get some oak logs then. </p>
+                            </div>
+                        </details>
+                        <p class="context-note">Brand New World</p>
+                    </div>
+                </div>
+
+                <div data-time="58" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#Chest" class="img-popup-link">
+                            <img src="Images/Chest.webp" alt="Chest Image">
+                        </a>
+                        <p class="file-name">&gt; Chest.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; They're doing the little cave base. uhh I just found this random chest, though.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Why is there a redstone?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh it's a bonus chest! Alright that makes sense.</p>
+                                <p class="action">Twixxel Opens the chest and finds a book named 'README'</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; okay um... read me</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Read me...</p>
+                                <p class="action">Twixxel starts reading the book.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Bonus Chest</p>
+                    </div>
+                </div>
+
+                <div class="mc-image-slot inline-slot" data-time="81" data-advancement="Read me...">
+                    <div>
+                        <a href="#Book1" class="img-popup-link">
+                            <img src="Images/BookPage1.webp" alt="Book Page 1">
+                        </a>
+                        <p class="file-name">&gt; BookPage1.webp</p>
+                    </div>
+                    <div>
+                        <a href="#Book2" class="img-popup-link">
+                            <img src="Images/BookPage2.webp" alt="Book Page 2">
+                        </a>
+                        <p class="file-name">&gt; BookPage2.webp</p>
+                    </div>
+                    <div>
+                        <a href="#Book3" class="img-popup-link">
+                            <img src="Images/BookPage3.webp" alt="Book Page 3">
+                        </a>
+                        <p class="file-name">&gt; BookPage3.webp</p>
+                    </div>
+                </div>
+
+                <div data-time="138" class="wiki-row" data-advancement="You called my name">
+                    <div class="mc-image-slot">
+                        <a href="#Creator" class="img-popup-link">
+                            <img src="Images/Creator.webp" alt="Creator first appearance">
+                        </a>
+                        <p class="file-name">&gt; Creator.png</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action">Twixxel closes the book and turns, finding the creator standing there.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh my god! What the f- What the hell are you</p>
+                                <p class="char-creator">[Creator] You called my name...</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; are you the thing from the book?</p>
+                                <p class="char-creator">[Creator] Yes.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; okay that make sense, but you scared the living shit out of me with that look on your face. Well it's fine uh so you're gonna help me with things now, right ? according from the book.</p>
+                                <p class="char-creator">[Creator] Yes.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay lemme think of something...</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait if what you're saying is true, can you give me a stack of Oak logs? Please?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the f-</p>
+                                <p class="action">The Creator extends his hand to Twixxel and spawns a stack of Oak logs.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Holy shit! Wait that's crazy!</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait just stay here real quick. Just stay here, I need to introduce you to my friends right now. Dude this is cra-</p>
+                                <p class="action">The Creator disappears.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Where did he go?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay wait, I have to get out of here first, I have to go back to them right now</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Dude this is insane, dude.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">He is the creator</p>
+                    </div>
+                </div>
+
+                <div data-time="195" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#ImageCreator" class="img-popup-link">
+                            <img src="Images/ImageCreator.webp" alt="Creator and the Others together">
+                        </a>
+                        <p class="file-name">&gt; ImageCreator.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action">Twixxel gets back to Mob and Idaios.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Where are they? Okay they're- Yo!</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Yo!</p>
+                                <p class="char-idaios">&lt;Idaios&gt; Yo! What's good?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Yo, guys, please just listen to me.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Guys I really have to show you something that I found, right now. It's actually crazy</p>
+                                <p class="char-idaios">&lt;Idaios&gt; uh, what do you mean?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; His name is creator and I have to you him, right now.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Erm... alright.</p>
+                                <p class="action">Creator appears beside Twixxel.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Here, I found him... his name is the creator and he does like crazy things. So like if you need help or something. Guys trust me it's actually</p>
+                                <p class="action">Idaios starts laughing, then mob laughs too.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Ain't no way man. You're funny</p>
+                                <p class="char-idaios">&lt;Idaios&gt; Oh yeah! man for real, bro's always doing these pranks</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Dude he's standing right there!</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Bro there's nothing there!</p>
+                                <p class="action">It appears that only Twixxel can see the Creator.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait, can they see you, creator?</p>
+                                <p class="char-creator">[Creator] No.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait, why not? Wait, you gave me a stack of oak logs, how can't they see you? Like this is... impossib-</p>
+                                <p class="action">The creator is gone again.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell?</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Look!</p>
+                    </div>
+                </div>
+
+                <div data-time="250" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#Dialog_1" class="img-popup-link">
+                            <img src="Images/Dialog_1.webp" alt="Dialog 1">
+                        </a>
+                        <p class="file-name">&gt; Dialog_1.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action">A few moments later...</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Guys it's not funny! How can you not see him? He was actually for me, he was right there</p>
+                                <p class="char-idaios">&lt;Idaios&gt; Well, it's kind of funny.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait, how is it funny? Like I'm...</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Whatever man. We'll make the cave a little bit better so we can sleep tonight hopefully.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I'll get some logs.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">They can't see him</p>
+                    </div>
+                </div>
+
+                <div data-time="266" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#Dialog_2" class="img-popup-link">
+                            <img src="Images/Dialog_2.webp" alt="Dialog 2">
+                        </a>
+                        <p class="file-name">&gt; Dialog_2.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action">Twixxel leaves the cave and goes behind a tree. And starts talking to himself</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay they're doing the cave right now.</p>
+                                <p class="action">He breaks down the tree.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay I'm gonna call the creator.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creato-</p>
+                                <p class="action">The creator appears behind Twixxel.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh my god! Dude stop... stop scaring me like that, please.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Look, I have soo so many questions, creator, really.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Like this is so weird...</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; But my most important question is , what's gonna happen in 7 days? Because it's on my screen and it's just blank. Can you just please answer that?</p>
+                                <p class="char-creator">[Creator] Why?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Because I want to know what's gonna happen in 7 days Like what-</p>
+                                <p class="action">The creator Jumpscares Twixxel.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh my god! What the f- Creator!</p>
+                                <p class="action">The creator Jumps away, and Twixxel goes back to the cave.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Why?</p>
+                    </div>
+                </div>
+
+                <div data-time="301" class="wiki-row text-only">
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-thatmob">&lt;Thatmob&gt; Yo Twix you're back!</p>
+                                <p class="char-idaios">&lt;Idaios&gt; Yoo!</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Yo, dude, I just got some blocks and... I just came back as fast as possible.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Alright let's sleep for now so we can continue the day after. </p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Twixxel don't forget to get iron tomorrow </p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright, as soon as I wake up I'm going to get the iron.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Back to the cave</p>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="mc-image-slot inline-slot">
-                <div>
-                    <a href="#Book1" class="img-popup-link">
-                        <img src="../Creator/Images/BookPage1.webp" alt="Book Page 1">
-                    </a>
-                    <p class="file-name">> BookPage1.webp</p>
-                </div>
-                <div>
-                    <a href="#Book2" class="img-popup-link">
-                        <img src="../Creator/Images/BookPage2.webp" alt="Book Page 2">
-                    </a>
-                    <p class="file-name">> BookPage2.webp</p>
-                </div>
-                <div>
-                    <a href="#Book3" class="img-popup-link">
-                        <img src="../Creator/Images/BookPage3.webp" alt="Book Page 3">
-                    </a>
-                    <p class="file-name">> BookPage3.webp</p>
-                </div>
+        <!-- ===================== NUIT 1 ===================== -->
+        <section class="chapter night" data-day="NIGHT 1">
+            <div class="chapter-head reveal">
+                <div class="celestial moon"></div>
+                <h2 class="chapter-title"><small>CHAPTER II</small><span>Night 1 &middot; Something Watches</span></h2>
+                <div class="chapter-rule"></div>
             </div>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#Creator" class="img-popup-link">
-                        <img src="../Creator/Images/Creator.webp" alt="Creator first appearance">
-                    </a>
-                    <p class="file-name">> Creator.png</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown"> 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="action">Twixxel closes the book and turns, finding the creator standing there.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh my god! What the f- What the hell are you</p>
-                            <p class="char-creator">[Creator] You called my name...</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; are you the thing from the book?</p>
-                            <p class="char-creator">[Creator] Yes.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; okay that make sense, but you scared the living shit out of me with that look on your face. Well it's fine uh so you're gonna help me with things now, right ? according from the book.</p>
-                            <p class="char-creator">[Creator] Yes.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay lemme think of something...</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait if what you're saying is true, can you give me a stack of Oak logs? Please?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the f-</p>
-                            <p class="action">The Creator extends his hand to Twixxel and spawns a stack of Oak logs.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Holy shit! Wait that's crazy!</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait just stay here real quick. Just stay here, I need to introduce you to my friends right now. Dude this is cra-</p>
-                            <p class="action">The Creator disappears.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Where did he go?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay wait, I have to get out of here first, I have to go back to them right now</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Dude this is insane, dude.</p>
-                        </div>
-                    </details>
-                    <p class="context-note">He is the creator</p>
+            <div class="wiki-entries">
+                <div data-time="324" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#SleepWell" class="img-popup-link">
+                            <img src="Images/SleepWell.webp" alt="Creator watching Twixxel sleep">
+                        </a>
+                        <p class="file-name">&gt; SleepWell.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action">Twixxel wakes up during the night</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Dude... what the... Dude,  where is Idaios? </p>
+                                <p class="action">He turns around and sees the creator, watching him sleep.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Sweet Dreams</p>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#ImageCreator" class="img-popup-link">
-                        <img src="../Creator/Images/ImageCreator.webp" alt="Creator and the Others together">
-                    </a>
-                    <p class="file-name">> ImageCreator.webp</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="action">Twixxel gets back to Mob and Idaios.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Where are they? Okay they're- Yo!</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Yo!</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Yo! What's good?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Yo, guys, please just listen to me.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Guys I really have to show you something that I found, right now. It's actually crazy</p>
-                            <p class="char-idaios">&lt;Idaios&gt; uh, what do you mean?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; His name is creator and I have to you him, right now.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Erm... alright.</p>
-                            <p class="action">Creator appears beside Twixxel.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Here, I found him... his name is the creator and he does like crazy things. So like if you need help or something. Guys trust me it's actually</p>
-                            <p class="action">Idaios starts laughing, then mob laughs too.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Ain't no way man. You're funny</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Oh yeah! man for real, bro's always doing these pranks</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Dude he's standing right there!</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Bro there's nothing there!</p>
-                            <p class="action">It appears that only Twixxel can see the Creator.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait, can they see you, creator?</p>
-                            <p class="char-creator">[Creator] No.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait, why not? Wait, you gave me a stack of oak logs, how can't they see you? Like this is... impossib-</p>
-                            <p class="action">The creator is gone again.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell?</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Look!</p>
-                </div>
+        <!-- ===================== JOUR 2 ===================== -->
+        <section class="chapter" data-day="DAY 2">
+            <div class="chapter-head reveal">
+                <div class="celestial sun"></div>
+                <h2 class="chapter-title"><small>CHAPTER III</small><span>Day 2 &middot; Thumbs-up</span></h2>
+                <div class="chapter-rule"></div>
             </div>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#Dialog_1" class="img-popup-link">
-                        <img src="../Creator/Images/Dialog_1.webp" alt="Dialog 1">
-                    </a>
-                    <p class="file-name">> Dialog_1.webp</p>
+            <div class="wiki-entries">
+                <div data-time="335" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#Morning" class="img-popup-link">
+                            <img src="Images/Morning.webp" alt="Twixxel waking up in the morning">
+                        </a>
+                        <p class="file-name">&gt; Morning.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action">Twixxel wakes up, in the morning this time.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Holy- </p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Good morning, neighbor </p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What? </p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Hey, morning. How did y'all sleep last night?</p>
+                                <p class="action">Why is there a new "s" at the end of Idaios's name?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Good.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Good, how about you? </p>
+                                <p class="char-idaios">&lt;Idaioss&gt; uh, I feel better! took a little walk.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Mhm. Yeah, sure you did</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Huh? I... I don't understand.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Well... I didn't saw you in the middle of the night.</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; I... was sleeping with you</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Interesting. The exact oposite for me man. I didn't saw you. But I was having a nightmare in my sleep. So I really don't know</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Well, it was just a nightmare, wasn't it?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Yeah.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Morning</p>
+                    </div>
                 </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="action">A few moments later...</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Guys it's not funny! How can you not see him? He was actually for me, he was right there</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Well, it's kind of funny.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait, how is it funny? Like I'm...</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Whatever man. We'll make the cave a little bit better so we can sleep tonight hopefully.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I'll get some logs.</p>
-                        </div>
-                    </details>
-                    <p class="context-note">They can't see him</p>
+
+                <div data-time="381" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#T-up" class="img-popup-link">
+                            <img src="Images/Thumbs-up.webp" alt="Creator giving a thumbs-up to Twixxel">
+                        </a>
+                        <p class="file-name">&gt; Thumbs-up.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; You mob, I'm going to get some iron now </p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Yeah that would be great. </p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright, Alright, I will see you guys</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay wait, I got, I have an idea, what if I ask the creator to build me a house?</p>
+                                <p class="action">The creator spawns right in front of Twixxel</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Holy dude.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait I just wanted to ask, can you build me a house?</p>
+                                <p class="char-creator">[Creator] Yes.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay thank you so much. Thank you.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Just do whatever you want alright? Whatever type of house you want.</p>
+                                <p class="action">The creator gives a thumbs-up</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh. Oh damn creator alright I see you</p>
+                                <p class="action">Twixxel leaves to go mining</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Thumbs-up</p>
+                    </div>
                 </div>
+
+            </div>
+        </section>
+
+        <!-- ===================== JOUR 3 ===================== -->
+        <section class="chapter" data-day="DAY 3">
+            <div class="chapter-head reveal">
+                <div class="celestial sun"></div>
+                <h2 class="chapter-title"><small>CHAPTER IV</small><span>Day 3 &middot; The House</span></h2>
+                <div class="chapter-rule"></div>
             </div>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#Dialog_2" class="img-popup-link">
-                        <img src="../Creator/Images/Dialog_2.webp" alt="Dialog 2">
-                    </a>
-                    <p class="file-name">> Dialog_2.webp</p>
+            <div class="wiki-entries">
+                <div data-time="456" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#MobPOV" class="img-popup-link">
+                            <img src="Images/MobPOV.webp" alt="mob's POV watching 'Twixxel' build the house">
+                        </a>
+                        <p class="file-name">&gt; MobPOV.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action">Twixxel was on his way returning from the mine and got teleported in front of the house Creator built, next to Idaios and Mob</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the... What is that house?</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Yo! this is a sick house! Twixxel I did NOT know you were this good at building stuff.</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Damn, Twixxel. How did you do that? it looks weird, but it's cool as hell.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What do you... I did not build that! What do you mean?</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; here we go again... with that</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; No! No! No! don't do that, I never built this... I... I never... I... I went mining, I got diamonds, I got iron. Here I have it in my inventory right there! What are you guys talking about this can't be true! like it's almost impossible</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Dude, we literally saw you build the house right in front of us, you... you're the one playing with us.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Yeah for real, this guy man...</p>
+                                <p class="action">we see a flashback from Mob's POV, watching "Twixxel" build the house</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay look. I really need you to be super quiet right now.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Take the flashlight.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay I will use that, but just be super quiet. Who knows who's inside? or whoever built that</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; And no before you say it it's not me.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">House?</p>
+                    </div>
                 </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="action">Twixxel leaves the cave and goes behind a tree. And starts talking to himself</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay they're doing the cave right now.</p>
-                            <p class="action">He breaks down the tree.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay I'm gonna call the creator.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creato-</p>
-                            <p class="action">The creator appears behind Twixxel.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh my god! Dude stop... stop scaring me like that, please.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Look, I have soo so many questions, creator, really.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Like this is so weird...</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; But my most important question is , what's gonna happen in 7 days? Because it's on my screen and it's just blank. Can you just please answer that?</p>
-                            <p class="char-creator">[Creator] Why?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Because I want to know what's gonna happen in 7 days Like what-</p>
-                            <p class="action">The creator Jumpscares Twixxel.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh my god! What the f- Creator!</p>
-                            <p class="action">The creator Jumps away, and Twixxel goes back to the cave.</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Why?</p>
+
+                <div data-time="526" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#Explore" class="img-popup-link">
+                            <img src="Images/Explore.webp" alt="Twixxel, Mob and Idaios inside the house">
+                        </a>
+                        <p class="file-name">&gt; Explore.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action">They enter the house</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; The hell?</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Well, it's for sure weird</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; But cool looking, I know for a fact Twixxel is not that good at building houses. THAT good and weird. It's just not his style</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Exactly what I'm trying to say, like how am I supposed to build all that? this looks so insane. It can't be me, you huys know that. But wait I asked the creator to build me a house though</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Hey, it looks amazing! Twixxel be losing his mind lately saying he didn't build it or something</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; No! no, like but like ugh...</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; But, but I, but I didn't. I didn't build it! You guys have to believe me,  I really didn't.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Yeah sure.</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Yeah right.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Let's sleep for now, we can discuss about it the next day.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I guess we can... let's just talk about it the next day. Good night.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Who?</p>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="wiki-row">
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-thatmob">&lt;Thatmob&gt; Yo Twix you're back!</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Yoo!</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Yo, dude, I just got some blocks and... I just came back as fast as possible.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Alright let's sleep for now so we can continue the day after. </p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Twixxel don't forget to get iron tomorrow </p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright, as soon as I wake up I'm going to get the iron.</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Why?</p>
-                </div>
+        <!-- ===================== NUIT 3 ===================== -->
+        <section class="chapter night" data-day="NIGHT 3">
+            <div class="chapter-head reveal">
+                <div class="celestial moon"></div>
+                <h2 class="chapter-title"><small>CHAPTER V</small><span>Night 3 &middot; The Dream</span></h2>
+                <div class="chapter-rule"></div>
             </div>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#SleepWell" class="img-popup-link">
-                        <img src="../Creator/Images/SleepWell.webp" alt="Creator watching Twixxel sleep">
-                    </a>
-                    <p class="file-name">> SleepWell.webp</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="action">Twixxel wakes up during the night</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Dude... what the... Dude,  where is Idaios? </p>
-                            <p class="action">He turns around and see the creator, watching him sleep.</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Sweat Dreams</p>
-                </div>
-            </div>
-
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#Morning" class="img-popup-link">
-                        <img src="../Creator/Images/Morning.webp" alt="Twixxel waking up in the morning">
-                    </a>
-                    <p class="file-name">> Morning.webp</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="action">Twixxel wakes up, in the morning this time.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Holy- </p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Good morning, neighbor </p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What? </p>
-                            <p class="char-idaios">&lt;Idaios&gt; Hey, morning. How did y'all sleep last night?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Good.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Good, how about you? </p>
-                            <p class="char-idaios">&lt;Idaios&gt; uh, I feel better! took a little walk.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Mhm. Yeah, sure you did</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Huh? I... I don't understand.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Well... I didn't saw you in the middle of the night.</p>
-                            <p class="char-idaios">&lt;Idaios&gt; I... was sleeping with you</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Interesting. The exact oposite for me man. I didn't saw you. But I was having a nightmare in my sleep. So I really don't know</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Well, it was just a nightmare, wasn't it?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Yeah.</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Morning</p>
+            <div class="wiki-entries">
+                <div data-time="581" class="wiki-row" data-advancement="Sweet Dreams">
+                    <div class="mc-image-slot">
+                        <a href="#Dream1" class="img-popup-link">
+                            <img src="Images/Dream1.webp" alt="Twixxel's dream: a red figure sitting in a dark room">
+                        </a>
+                        <p class="file-name">&gt; Dream1.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Where the... Where the heck am I?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Hello? Hello?... Where the heck am I?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Is this like a dream or something? Like... what am I?</p>
+                                <p class="char-creator">[Creator] I have a full heart, but it’s never enough.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creator?</p>
+                                <p class="char-creator">[Creator] You *groan* are so ungrateful.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait, what do you mean I'm so...</p>
+                                <p class="char-creator">[Creator] I need you to quick try to run.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What... What?</p>
+                                <p class="char-creator">[Creator] Your work of art is nearly done.</p>
+                                <p class="char-creator">*howl*</p>
+                                <p class="action">wth is that supposed to mean???</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Twixxel is dreaming</p>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#T-up" class="img-popup-link">
-                        <img src="../Creator/Images/Thumbs-up.webp" alt="Creator giving a thumbs-up to Twixxel">
-                    </a>
-                    <p class="file-name">> Thumbs-up.webp</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; You mob, I'm going to get some iron now </p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Yeah that would be great. </p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright, Alright, I will see you guys</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay wait, I got, I have an idea, what if I ask the creator to build me a house?</p>
-                            <p class="action">The creator spawns right in front of Twixxel</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Holy dude.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait I just wanted to ask, can you build me a house?</p>
-                            <p class="char-creator">[Creator] Yes.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay thank you so much. Thank you.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Just do whatever you want alright? Whatever type of house you want.</p>
-                            <p class="action">The creator gives a thumbs-up</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh. Oh damn creator alright I see you</p>
-                            <p class="action">Twixxel leaves to go mining</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Thumbs-up</p>
-                </div>
+        <!-- ===================== JOUR 4 ===================== -->
+        <section class="chapter" data-day="DAY 4">
+            <div class="chapter-head reveal">
+                <div class="celestial sun"></div>
+                <h2 class="chapter-title"><small>CHAPTER VI</small><span>Day 4 &middot; The Incident</span></h2>
+                <div class="chapter-rule"></div>
             </div>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#MobPOV" class="img-popup-link">
-                        <img src="../Creator/Images/MobPOV.webp" alt="mob's POV watching 'Twixxel' build the house">
-                    </a>
-                    <p class="file-name">> MobPOV.webp</p>
+            <div class="wiki-entries">
+                <div data-time="626" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#idkbro" class="img-popup-link">
+                            <img src="Images/idkbro.webp" alt="Twixxel waking up from the nightmare">
+                        </a>
+                        <p class="file-name">&gt; idkbro.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; oh my god... oh my god...</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; HOLY SHIT!</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; oh my god... *sigh*</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Dude, what the heck were you dreaming about?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I was dreaming about...</p>
+                                <p class="char-creator">[Creator] Don't.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; About?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; It's nothing interesting don't worry. It's fine.</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Alright, me and Idaios are going out, get some materials like iron and diamonds and all that. You can work on the farm or something. Whatever you want. We'll be back soon.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright, good luck.</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; hm. Bye-Byeeeeeee... <button class="yt-clip" data-video="6MkxADy0wAs" data-start="651" data-end="652" title="Listen to this moment">▶ PLAY</button></p>
+                            </div>
+                        </details>
+                        <p class="context-note">What kind of dream was that?</p>
+                    </div>
                 </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="action">Twixxel was on his way returning from the mine and got teleported in front of the house Creator built, next to Idaios and Mob</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the... What is that house?</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Yo! this is a sick house! Twixxel I did NOT know you were this good at building stuff.</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Damn, Twixxel. How did you do that? it looks weird, but it's cool as hell.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What do you... I did not build that! What do you mean?</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; here we go again... with that</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; No! No! No! don't do that, I never built this... I... I never... I... I went mining, I got diamonds, I got iron. Here I have it in my inventory right there! What are you guys talking about this can't be true! like it's almost impossible</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Dude, we literally saw you build the house right in front of us, you... you're the one playing with us.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Yeah for real, this guy man...</p>
-                            <p class="action">we see a flashback on Mob's pov, watching "Twixxel" build the house</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay look. I really need you to be super quiet right now.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Take the flashlight.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay I will use that, but just be super quiet. Who knows who's inside? or whoever built that</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; And no before you say it it's not me.</p>
-                        </div>
-                    </details>
-                    <p class="context-note">house?</p>
+
+                <div data-time="652" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#thunderdammn" class="img-popup-link">
+                            <img src="Images/thunderdammn.webp" alt="image of a thunderstorm in the game">
+                        </a>
+                        <p class="file-name">&gt; thunderdammn.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell was I dreaming about dude... and it's thunder... how worse can it get man?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright, let's just make some armor... Alright looks good.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; DAAAAMMMNN!!! <button class="yt-clip" data-video="6MkxADy0wAs" data-start="662.8" data-end="664.1" title="Listen to this moment">▶ PLAY</button></p>
+                            </div>
+                        </details>
+                        <p class="context-note">Twixxel crafting stuff and DAMNNN</p>
+                    </div>
                 </div>
+
+                <div data-time="664" class="wiki-row" data-advancement="Don't give it permission">
+                    <div class="mc-image-slot">
+                        <a href="#structurebuild" class="img-popup-link">
+                            <img src="Images/structurebuild.webp" alt="weird redstone thing on the ground">
+                        </a>
+                        <p class="file-name">&gt; structurebuild.webp</p>
+                        <a href="#creatorinthedistance" class="img-popup-link">
+                            <img src="Images/creatorinthedistance.webp" alt="Creator in the distance">
+                        </a>
+                        <p class="file-name">&gt; creatorinthedistance.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What's gonna happen at 4 days? What the hell? I'm actually a bit scared of...</p>
+                                <p class="action">Twixxel sees a weird build on the ground.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell? Dude, what is, what is this bullshit?</p>
+                                <p class="action">Twixxel picks up a book in the middle of the weird build.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; The incident? What? Let's read it.</p>
+                                <p class="action">------------ Page 1 ------------</p>
+                                <p class="book">&lt;Twixxel_lesgo&gt; Record 09</p>
+                                <p class="book">&lt;Twixxel_lesgo&gt; Do not ask it questions.</p>
+                                <p class="book">&lt;Twixxel_lesgo&gt; It becomes interested.</p>
+                                <p class="action">------------ Page 2 ------------</p>
+                                <p class="book">&lt;Twixxel_lesgo&gt; Record 12</p>
+                                <p class="book">&lt;Twixxel_lesgo&gt; It started doing things without being told.</p>
+                                <p class="action">------------ Page 3 ------------</p>
+                                <p class="book">&lt;Twixxel_lesgo&gt; D0■T ■1V■ 1■ PE■M1■■10■</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Don't... What is it... What is this? What does it say?</p>
+                                <p class="action">tbh he's pretty dumb, it clearly says "Don't give it permission"</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Dude this is the weirdest exper-</p>
+                                <p class="action"> he sees the Creator in the distance, from the window</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; OH, HELL NO! What the f- it has eyes in its mouth, okay... what was that</p>
+                                <p class="action"> Twixxel starts to block the way</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Twixxel Reads a book</p>
+                    </div>
+                </div>
+
+                <div data-time="724" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#HelpYou" class="img-popup-link">
+                            <img src="Images/HelpYou.webp" alt="Picture of Creator">
+                        </a>
+                        <p class="file-name">&gt; HelpYou.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What was that? What the f-</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Stop.</p>
+                                <p class="action"> Twixxel gets his axe</p>
+                                <p class="char-creator">[Creator] No.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creator... Creator, no, stop, stop please!</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creato- Creator!</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the... did you just... did you just teleport?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creator what do you want?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Please tell me just, just what do you want?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Please.</p>
+                                <p class="char-creator">[Creator] Help you.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What?... You... You want to help me?</p>
+                                <p class="char-creator">[Creator] Yes.</p>
+                                <p class="action"> He says yes but YouTube's Subtitles says "No." idk why</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh my god...</p>
+                                <p class="action"> Twixxel takes a screenshot</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay I'm wurk, that's very nice of you Creator, really.</p>
+                                <p class="action"> Twixxel takes ANOTHER screenshot</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Yeah, oh wait, I'm going to do the farm like right now, so if you want to help me with that you can-</p>
+                                <p class="char-creator">[Creator] Why did you take a screenshot of me?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What? What... no. no. I mean, I, I, I did a screenshot because you look very cool, that's the only thing why. Cuz you know, it's, it's you look kind of cool and I wanted to take a screenshot, you know.</p>
+                                <p class="action"> Twixxel leaves and start making the farm.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">He wants to help</p>
+                    </div>
+                </div>
+
+                <div data-time="795" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#Farm" class="img-popup-link">
+                            <img src="Images/Farm.webp" alt="Picture of the farm">
+                        </a>
+                        <p class="file-name">&gt; Farm.webp</p>
+                        <a href="#MakeItRain" class="img-popup-link">
+                            <img src="Images/MakeItRain.webp" alt="Twixxel asks the creator to make it rain">
+                        </a>
+                        <p class="file-name">&gt; MakeItRain.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action"> He talks to himself</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Why is he scared?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay that looks very good actually, but... we have to make it rain</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Uh creator? Cre-</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay, oh... there you are. Uh I just wanted to ask if possible could you make it rain? Please?</p>
+                                <p class="action"> Creator snaps his fingers and the rain starts</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What? Oh shit! Thank you so much. That was crazy.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Twixxel asks creator to make it rain</p>
+                    </div>
+                </div>
+
+                <div data-time="823" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#Music" class="img-popup-link">
+                            <img src="Images/Music.webp" alt="Creator with his hands on top of the jukebox">
+                        </a>
+                        <p class="file-name">&gt; Music.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; It's kind of boring if there is no music.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Uh Creator? Creator?</p>
+                                <p class="action"> He spawns right behing Twixxel</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh, you're always behing me... Uh I just wanted to ask you, could you please play any... music? </p>
+                                <p class="action"> The Creator put his hands on top of the jukebox and music starts playing</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Ow, oh holy shit...</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay, Okay. What type of music is that? Okay, anothe- another question... uhm.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Look, I know I shouldn't be asking this but... what's gonna happen in 4 days? What's gonna happen? I'm actually scared and I want you to give me an answer.</p>
+                                <p class="action"> The music plays louder</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creator?</p>
+                                <p class="action"> Twixxel turns around and Creator is gone</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; He's gone... Again. I shouldn't be asking this question or else he would be mad. Okay but it's good.</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Twixxel asks creator for some music</p>
+                    </div>
+                </div>
+
+                <div data-time="881" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#Hewatches" class="img-popup-link">
+                            <img src="Images/Hewatches.webp" alt="Creator is in the corner">
+                        </a>
+                        <p class="file-name">&gt; Hewatches.webp</p>
+                        <a href="#Art" class="img-popup-link">
+                            <img src="Images/Art.webp" alt="Creator talking to Twixxel">
+                        </a>
+                        <p class="file-name">&gt; Art.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="action"> Twixxel goes back to the farm</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I'm not gonna call him anymore... for now, really.</p>
+                                <p class="action"> Twixxel Picks up the crops</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Let's place them back!</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay, it looks good, Looks good. Let's do, Yeah let's do a fence around. Much better</p>
+                                <p class="action"> Twixxel goes back to the house and crafts some fences</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright dude, this music is kind of weird though, gotta be honest.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Also, oh my... it starts in 3 days now</p>
+                                <p class="action"> Twixxel Places all the fences around the farm</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright that looks good!</p>
+                                <p class="action"> Twixxel replaces the doors of the house</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay now new doors. These ones are much better. wait they also move better, here... oh yeah that is much better, I like that.</p>
+                                <p class="action"> Twixxel places slabs around the beds</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Okay, now we can just make the-</p>
+                                <p class="action"> Creator appears in the corner</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the- Creator? Was that you- Creator what are you doing? I didn't call you. Creator? Hello-</p>
+                                <p class="char-creator">[Creator] You really know what you want?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What do you mean? I... I, I don't get</p>
+                                <p class="char-creator">[Creator] God, I want to tear you apart.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What? Wait, why?</p>
+                                <p class="char-creator">[Creator] Just appreciate my art</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What did I do? Creator? Crea- what is happening to you? Creator, Please.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creator?</p>
+                                <p class="action"> Twixxel leaves and blocks the way with oak logs</p>
+                                <p class="char-creator">[Creator] I keep on giving, giving</p>
+                                <p class="char-creator">[Creator] There are some things that I’m missing.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I don't know what you mean!</p>
+                                <p class="char-creator">[Creator] *Super evil laugh*</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell?</p>
+                                <p class="action"> Twixxel breaks the oak logs</p>
+                            </div>
+                        </details>
+                        <p class="context-note">He watches</p>
+                    </div>
+                </div>
+
+                <div data-time="None" class="wiki-row">
+                    <div class="mc-image-slot">
+                        <a href="#Window" class="img-popup-link">
+                            <img src="Images/Window.webp" alt="Twixxel looks through a window, looking for his friends">
+                        </a>
+                        <p class="file-name">&gt; Window.webp</p>
+                        <a href="#Monster" class="img-popup-link">
+                            <img src="Images/Monster.webp" alt="Creator in a weird pose">
+                        </a>
+                        <p class="file-name">&gt; Monster.webp</p>
+                        <a href="#scratch the window" class="img-popup-link">
+                            <img src="Images/scratch the window.webp" alt="Creator scratching the window">
+                        </a>
+                        <p class="file-name">&gt; scratch the window.webp</p>
+                    </div>
+                    <div class="text-slot">
+                        <details class="mc-dropdown">
+                            <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                            <div class="quote-text">
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; It's been 5 minutes, Creator? Look I just wanna talk, please... He's gone... What did I do?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I really didn't do anything. Where are my friends they're taking so long!</p>
+                                <p class="action"> Twixxel looks through the windows</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Dude where are they? I can't find them anywhe-</p>
+                                <p class="action"> Something fast goes through the window and passes right in front of twixxel's face</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the f-</p>
+                                <p class="action"> Twixxel sees Creator through the broken window, Creator's in a super weird pose and moves and does crackling sounds</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creator? Creator stop, please.</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What did I- Creator?</p>
+                                <p class="action"> Creator sprints to Twixxel</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; HOLY SHIT NO! OH MY GOD!</p>
+                                <p class="action"> Twixxel turns around and sees creator crawling through the window</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the f-</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; He's getting inside, what the hell was that? What the hell...</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Oh my god... oh my god...</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the...</p>
+                                <p class="action"> Twixxel hears weird noises and turns around and sees Creator scratch the window</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell...?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; No... No! NOO! OH my gosh!</p>
+                                <p class="action"> Twixxel starts running and hears hears Mob right before leaving the house</p>
+                                <p class="char-thatmob">&lt;Thatmob&gt; Twixxel?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait what?</p>
+                                <p class="action"> Twixxel turns around and sees Mob and Idaioss</p>
+                                <p class="char-idaios">&lt;Idaioss&gt; Twixxel... what are you doing?</p>
+                                <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait what do you mean what I was doing? I was... chased by...</p>
+                                <p class="action"> Twixxel turns around again and sees the day</p>
+                            </div>
+                        </details>
+                        <p class="context-note">Twixxel looking for his friends</p>
+                    </div>
+                </div>
+
+
             </div>
+        </section>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#Explore" class="img-popup-link">
-                        <img src="../Creator/Images/Explore.webp" alt="Twixxel, Mob and Idaios inside the house">
-                    </a>
-                    <p class="file-name">> Explore.webp</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="action">They enter the house</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; The hell?</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Well, it's for sure weird</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; But cool looking, I know for a fact Twixxel is not that good at building houses. THAT good and weird. It's just not his style</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Exactly what I'm trying to say, like how am I supposed to build all that? this looks so insane. It can't be me, you huys know that. But wait I asked the creator to build me a house though</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Hey, it looks amazing! Twixxel be losing his mind lately saying he didn't build it or something</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; No! no, like but like ugh...</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; But, but I, but I didn't. I didn't build it! You guys have to believe me,  I really didn't.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Yeah sure.</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Yeah right.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Let's sleep for now, we can discuss about it the next day.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I guess we can... let's just talk about it the next day. Good night.</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Who?</p>
-                </div>
-            </div>
+        <!-- ===================== SUITE À VENIR ===================== -->
+        <section class="corrupt reveal">
+            <p class="big">[ DATA NOT YET RECOVERED ]</p>
+            <p class="small">The rest of level.dat is still corrupted. Thanks for reading everything! Come back soon.</p>
+        </section>
 
+    </main>
 
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#Dream1" class="img-popup-link">
-                        <img src="../Creator/Images/Dream1.webp" alt="Twixxel's dream: a red figure sitting in a dark room">
-                    </a>
-                    <p class="file-name">> Dream1.webp</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Where the... Where the heck am I?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Hello? Hello?... Where the heck am I?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Is this like a dream or something? Like... what am I?</p>
-                            <p class="char-creator">[Creator] *inaudible* but it's never enough.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creator?</p>
-                            <p class="char-creator">[Creator] You *groan* are so ungrateful.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait, what do you mean I'm so...</p>
-                            <p class="char-creator">[Creator] And too quick to *inaudible* one.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What... What?</p>
-                            <p class="char-creator">[Creator] New work of art is nearly done.</p>
-                            <p class="char-creator">*howl*</p>
-                            <p class="action">wth is that supposed to mean???</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Twixxel is dreaming</p>
-                </div>
-            </div>
-
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#idkbro" class="img-popup-link">
-                        <img src="../Creator/Images/idkbro.webp" alt="Twixxel's dream: a red figure sitting in a dark room">
-                    </a>
-                    <p class="file-name">> idkbro.webp</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown" > 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; oh my god... oh my god...</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; HOLY SHIT!</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; oh my god... *sigh*</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Dude, what the heck were you dreaming about?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I was dreaming about...</p>
-                            <p class="char-creator">[Creator] Don't.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; About?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; It's nothing interesting don't worry. It's fine.</p>
-                            <p class="char-thatmob">&lt;Thatmob&gt; Alright, me and Idaios are going out, get some materials like iron and diamonds and all that. You can work on the farm or something. Whatever you want. We'll be back soon.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright, good luck.</p>
-                            <p class="char-idaios">&lt;Idaios&gt; hm. Bye-Byeeeeeee... <button class="yt-clip" data-video="6MkxADy0wAs" data-start="651" data-end="652" title="Listen to this moment">▶ PLAY</button></p>
-                        </div>
-                    </details>
-                    <p class="context-note">What kind of dream was that?</p>
-                </div>
-            </div>
-
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#thunderdammn" class="img-popup-link">
-                        <img src="../Creator/Images/thunderdammn.webp" alt="image of a thunderstorm in the game">
-                    </a>
-                    <p class="file-name">> thunderdammn.webp</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown"> 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell was I dreaming about dude... and it's thunder... how worse can it get man?</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright, let's just make some armor... Alright looks good.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; DAAAAMMMNN!!! <button class="yt-clip" data-video="6MkxADy0wAs" data-start="662.8" data-end="664.1" title="Listen to this moment">▶ PLAY</button></p>
-                            
-                        </div>
-                    </details>
-                    <p class="context-note">Twixxel crafting stuff and DAMNNN</p>
-                </div>
-            </div>
-
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#structurebuild" class="img-popup-link">
-                        <img src="../Creator/Images/structurebuild.webp" alt="weird redstone thing on the ground">
-                    </a>
-                    <p class="file-name">> structurebuild.webp</p>
-                    <br>
-                    <a href="#creatorinthedistance" class="img-popup-link">
-                        <img src="../Creator/Images/creatorinthedistance.webp" alt="Creator in the distance">
-                    </a>
-                    <p class="file-name">> creatorinthedistance.webp</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown"> 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What's gonna happen at 4 days? What the hell? I'm actually a bit scared of...</p>
-                            <p class="action">Twixxel sees a weird build on the ground.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What the hell? Dude, what is, what is this bullshit?</p>
-                            <p class="action">Twixxel picks up a book in the middle of the weird build.</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; The incident? What? Let's read it.</p>
-                            <p class="action">------------ Page 1 ------------</p>
-                            <p class="book">&lt;Twixxel_lesgo&gt; Record 09</p>
-                            <p class="book">&lt;Twixxel_lesgo&gt; Do not ask it questions.</p>
-                            <p class="book">&lt;Twixxel_lesgo&gt; It becomes interested.</p>
-                            <p class="action">------------ Page 2 ------------</p>
-                            <p class="book">&lt;Twixxel_lesgo&gt; Record 12</p>
-                            <p class="book">&lt;Twixxel_lesgo&gt; It started doing things without being told.</p>
-                            <p class="action">------------ Page 3 ------------</p>
-                            <p class="book">&lt;Twixxel_lesgo&gt; D0■T ■1V■ 1■ PE■M1■■10■</p>
-                            <br>        
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Don't... What is it... What is this? What does it say?</p>
-                            <p class="action">tbh he's pretty dumb it clearly "says Don't give it permission"</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Dude this is the weirdest exper-</p>
-                            <p class="action"> he sees the Creator in the distance, from the window</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; OH, HELL NO! What the f- it has eyes in its mouth, okay... what was that</p>
-                            <p class="action"> Twixxel starts to block the way</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Twixxel Reads a book</p>
-                </div>
-            </div>
-            
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#img1" class="img-popup-link">
-                        <img src="https://via.placeholder.com/280x150" alt="Image Placeholder">
-                    </a>
-                    <p class="file-name">> log_scene_01.png</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown"> 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What was that? What the f-</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Stop.</p>
-                            <p class="action"> Twixxel gets his axe</p>
-                            <p class="char-creator">[Creator] No.</p>
-                            <p class="action"> I'm gonna continue the dialog later, thanks for reading everything!</p>
-                        </div>
-                    </details>
-                    <p class="context-note"> Nothing here for now</p>
-                </div>
-            </div>
-
-
-
-            <div class="episode-divider">
-            [ INSERT NEXT SECTION TITLE HERE ]
-            </div>
-            <!-- Add more wiki-row entries as needed -->
-            <div class="wiki-row">
-                <div class="mc-image-slot">
-                    <a href="#img1" class="img-popup-link">
-                        <img src="https://via.placeholder.com/280x150" alt="Image Placeholder">
-                    </a>
-                    <p class="file-name">> log_scene_01.png</p>
-                </div>
-                <div class="text-slot">
-                    <details class="mc-dropdown"> 
-                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
-                        <div class="quote-text">
-                            <p class="char-thatmob">&lt;Thatmob&gt; Your dialogue line here...</p>
-                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Your dialogue line here...</p>
-                            <p class="char-idaios">&lt;Idaios&gt; Your dialogue line here...</p>
-                            <p class="action">* Dynamic event description *</p>
-                            <p class="char-creator">[Creator] Glowing creator response here...</p>
-                        </div>
-                    </details>
-                    <p class="context-note">Context note description goes here.</p>
-                </div>
-            </div>
-            <!-- Add more wiki-row entries as needed -->
-
-
-
-
-
-        </div> 
-    </div>
-    
-    <!-- Lightbox unique : remplie automatiquement au clic sur n'importe quelle image -->
-    <a href="#close" class="lightbox" id="lightbox">
+    <!-- Lightbox unique : remplie au clic sur n'importe quelle image -->
+    <div class="lightbox" id="lightbox">
         <div class="lightbox-content">
             <img src="" alt="">
-            <p class="file-name" style="text-align: center; margin-top: 10px;"></p>
+            <div class="lightbox-bar">
+                <button type="button" data-step="-1">&lt;</button>
+                <p class="file-name"></p>
+                <button type="button" data-step="1">&gt;</button>
+            </div>
         </div>
-    </a>
+    </div>
+
+    <div class="toasts" id="toasts"></div>
+
+    <footer>
+        <a href="../../mentions-legales.html">Mentions l&eacute;gales</a>
+    </footer>
+
     <script>
+        var CALM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // Coupe "<Nom> message" en deux pour colorer le nom et garder le message lisible
+        document.querySelectorAll(".quote-text p").forEach(function (p) {
+            var first = p.firstChild;
+            if (!first || first.nodeType !== Node.TEXT_NODE) return;
+            var m = first.nodeValue.match(/^(\s*(?:<[^>]+>|\[[^\]]+\]))\s*/);
+            if (!m) return;
+            var name = document.createElement("span");
+            name.className = "name";
+            name.textContent = m[1].trim();
+            var msg = document.createElement("span");
+            msg.className = "msg";
+            msg.textContent = first.nodeValue.slice(m[0].length);
+            p.replaceChild(msg, first);
+            p.insertBefore(name, msg);
+            // Le bouton ▶ PLAY reste après le message
+        });
+
+        // Nombre de répliques affiché sur chaque bouton de dialogue
+        document.querySelectorAll(".mc-dropdown").forEach(function (d) {
+            var n = d.querySelectorAll(".quote-text p").length;
+            var span = document.createElement("span");
+            span.className = "count";
+            span.textContent = "(" + n + " lines)";
+            d.querySelector(".quote-title").appendChild(span);
+        });
+    </script>
+
+    <script>
+        // Écran titre : texte tapé, splash au hasard, glitch du logo
+        (function () {
+            var SPLASHES = [
+                "Do not ask it questions!",
+                "It becomes interested!",
+                "Don't give it permission!",
+                "Only Twixxel can see it!",
+                "New work of art is nearly done!",
+                "Bonus chest included!",
+                "It has eyes in its mouth!",
+                "Sweet dreams!"
+            ];
+            document.getElementById("splash").textContent = SPLASHES[Math.floor(Math.random() * SPLASHES.length)];
+
+            var line = "> Recovered from /.minecraft/saves/New World/level.dat";
+            var out = document.getElementById("typed");
+            if (CALM) { out.textContent = line; } else {
+                var i = 0;
+                setTimeout(function tick() {
+                    out.textContent = line.slice(0, ++i);
+                    if (i < line.length) setTimeout(tick, 28 + Math.random() * 50);
+                }, 700);
+            }
+
+            if (CALM) return;
+            var logo = document.getElementById("logo");
+            setInterval(function () {
+                if (Math.random() < 0.5) return;
+                logo.classList.remove("glitch");
+                void logo.offsetWidth;
+                logo.classList.add("glitch");
+            }, 2600);
+        })();
+    </script>
+
+    <script>
+        // Défilement : barre d'XP, jour en cours, apparition des entrées, succès
+        (function () {
+            var fill = document.getElementById("xpFill");
+            var level = document.getElementById("xpLevel");
+            var chapters = document.querySelectorAll(".chapter");
+
+            function onScroll() {
+                var max = document.documentElement.scrollHeight - innerHeight;
+                fill.style.width = (max > 0 ? scrollY / max * 100 : 0) + "%";
+                var current = null;
+                chapters.forEach(function (c) {
+                    if (c.getBoundingClientRect().top < innerHeight * 0.5) current = c;
+                });
+                level.classList.toggle("show", !!current);
+                if (current) level.textContent = current.dataset.day;
+            }
+            addEventListener("scroll", onScroll, { passive: true });
+            onScroll();
+
+            document.querySelectorAll(".wiki-row, .mc-image-slot.inline-slot").forEach(function (el) {
+                el.classList.add("reveal");
+            });
+
+            var toasts = document.getElementById("toasts");
+            function advancement(title) {
+                var t = document.createElement("div");
+                t.className = "toast";
+                t.innerHTML = '<img src="Creator.png" alt=""><div><p class="t1">Advancement Made!</p><p class="t2"></p></div>';
+                t.querySelector(".t2").textContent = title;
+                toasts.appendChild(t);
+                while (toasts.children.length > 2) toasts.firstChild.remove();
+                setTimeout(function () { t.remove(); }, 4800);
+            }
+            window.advancement = advancement;
+
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) {
+                    if (!e.isIntersecting) return;
+                    e.target.classList.add("seen");
+                    var adv = e.target.dataset.advancement;
+                    if (adv) { advancement(adv); delete e.target.dataset.advancement; }
+                    io.unobserve(e.target);
+                });
+            }, { threshold: 0.15 });
+            document.querySelectorAll(".reveal").forEach(function (el) { io.observe(el); });
+
+            // Premier succès quand on quitte l'écran titre
+            var first = true;
+            addEventListener("scroll", function () {
+                if (first && scrollY > innerHeight * 0.6) { first = false; advancement("Something is Already Here"); }
+            }, { passive: true });
+        })();
+    </script>
+
+    <script>
+        // Easter eggs : taper "creator" au clavier, et des yeux qui apparaissent parfois dans le noir
+        (function () {
+            var eyes = document.getElementById("eyes");
+            var flash = document.getElementById("flash");
+
+            function showEyes() {
+                if (CALM || document.hidden) return;
+                var side = Math.random() < 0.5;
+                eyes.style.left = side ? (2 + Math.random() * 6) + "vw" : "auto";
+                eyes.style.right = side ? "auto" : (2 + Math.random() * 6) + "vw";
+                eyes.style.top = (15 + Math.random() * 70) + "vh";
+                eyes.classList.remove("on");
+                void eyes.offsetWidth;
+                eyes.classList.add("on");
+            }
+            (function loop() {
+                setTimeout(function () { showEyes(); loop(); }, 35000 + Math.random() * 45000);
+            })();
+
+            var typed = "";
+            addEventListener("keydown", function (e) {
+                if (e.key.length !== 1) return;
+                typed = (typed + e.key.toLowerCase()).slice(-7);
+                if (typed !== "creator") return;
+                typed = "";
+                if (!CALM) {
+                    flash.classList.remove("on");
+                    void flash.offsetWidth;
+                    flash.classList.add("on");
+                }
+                showEyes();
+                var c = document.createElement("div");
+                c.className = "chat-toast";
+                c.innerHTML = '<p class="char-creator" style="margin:0"><span class="name">[Creator]</span> <span class="msg">You called my name...</span></p>';
+                document.body.appendChild(c);
+                setTimeout(function () { c.remove(); }, 6000);
+            });
+        })();
+    </script>
+
+    <script>
+        // Lightbox avec flèches pour passer d'une image à l'autre
         (function () {
             var box = document.getElementById("lightbox");
             var boxImg = box.querySelector("img");
             var boxName = box.querySelector(".file-name");
+            var links = Array.prototype.slice.call(document.querySelectorAll(".img-popup-link"));
+            var index = 0;
 
-            document.querySelectorAll(".img-popup-link").forEach(function (link) {
-                link.addEventListener("click", function (e) {
-                    e.preventDefault();
-                    var img = link.querySelector("img");
-                    var name = link.parentElement.querySelector(".file-name");
-                    boxImg.src = img.src;
-                    boxImg.alt = img.alt;
-                    boxName.textContent = name ? name.textContent : "> " + img.src.split("/").pop();
-                    box.classList.add("open");
-                });
-            });
-
-            function close(e) {
-                if (e) e.preventDefault();
-                box.classList.remove("open");
+            function show(i) {
+                index = (i + links.length) % links.length;
+                var link = links[index];
+                var img = link.querySelector("img");
+                var name = link.nextElementSibling;
+                boxImg.src = img.src;
+                boxImg.alt = img.alt;
+                boxName.textContent = (name && name.classList.contains("file-name") ? name.textContent : "> " + img.src.split("/").pop())
+                    + "  [" + (index + 1) + "/" + links.length + "]";
+                var content = box.querySelector(".lightbox-content");
+                content.style.animation = "none";
+                void content.offsetWidth;
+                content.style.animation = "";
+                box.classList.add("open");
             }
-            box.addEventListener("click", close);
-            document.addEventListener("keydown", function (e) {
-                if (e.key === "Escape") close();
+
+            links.forEach(function (link, i) {
+                link.addEventListener("click", function (e) { e.preventDefault(); show(i); });
+            });
+            box.querySelectorAll("button").forEach(function (b) {
+                b.addEventListener("click", function (e) { e.stopPropagation(); show(index + Number(b.dataset.step)); });
+            });
+            boxImg.addEventListener("click", function (e) { e.stopPropagation(); });
+            box.addEventListener("click", function () { box.classList.remove("open"); });
+            addEventListener("keydown", function (e) {
+                if (!box.classList.contains("open")) return;
+                if (e.key === "Escape") box.classList.remove("open");
+                if (e.key === "ArrowRight") show(index + 1);
+                if (e.key === "ArrowLeft") show(index - 1);
             });
         })();
     </script>
+
     <script>
         // Une animation au hasard (jamais deux fois la même d'affilée) à chaque ouverture/fermeture d'un dialogue
         (function () {
-            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
             var ANIMS = ["glitch", "scan", "static", "flicker", "lines", "decrypt"];
             var DURATION = { glitch: 500, scan: 450, static: 500, flicker: 600 };
             var NOISE = "▓▒░█#@$%&?!<>/\\";
@@ -1129,7 +2039,6 @@
                 return (last = name);
             }
 
-            // Lignes : les répliques glissent une par une
             function lines(box, closing) {
                 var ps = box.querySelectorAll("p");
                 var step = Math.min(60, 600 / ps.length);
@@ -1140,13 +2049,15 @@
                 return ps.length * step + 250;
             }
 
-            // Décryptage : le texte se brouille puis se reconstitue (ou l'inverse en fermant)
+            // Décryptage : tous les morceaux de texte, sauf ceux des boutons ▶ PLAY
             function decrypt(box, closing) {
-                // Seulement le texte de chaque réplique, pour ne pas effacer les boutons ▶ PLAY
                 var nodes = [];
-                box.querySelectorAll("p").forEach(function (p) {
-                    if (p.firstChild && p.firstChild.nodeType === Node.TEXT_NODE) nodes.push(p.firstChild);
+                var walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT, {
+                    acceptNode: function (n) {
+                        return n.parentNode.closest("button") || !n.nodeValue.trim() ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
+                    }
                 });
+                while (walker.nextNode()) nodes.push(walker.currentNode);
                 var originals = nodes.map(function (n) { return n.nodeValue; });
                 var frames = 14, frame = 0;
                 var timer = setInterval(function () {
@@ -1169,6 +2080,7 @@
             }
 
             function play(box, closing) {
+                if (CALM) return Promise.resolve();
                 var name = pick();
                 var time;
                 if (name === "lines") time = lines(box, closing);
@@ -1204,6 +2116,20 @@
             });
         })();
     </script>
+
+    <script>
+        // Timestamps : affiche à quel moment de la vidéo se passe chaque scène
+        document.querySelectorAll("[data-time]").forEach(function (row) {
+            var t = parseInt(row.dataset.time, 10);
+            var label = document.createElement("span");
+            label.className = "ts";
+            label.innerHTML = "VIDEO &middot; <b>" + Math.floor(t / 60) + ":" + String(t % 60).padStart(2, "0") + "</b>";
+            var slot = row.querySelector(".text-slot");
+            if (slot) slot.insertBefore(label, slot.querySelector(".mc-dropdown"));
+            else row.appendChild(label);
+        });
+    </script>
+
     <script>
         // Boutons ▶ PLAY : joue un court extrait de la vidéo YouTube dans un mini-lecteur qui se ferme tout seul
         (function () {
@@ -1247,14 +2173,13 @@
                     document.body.appendChild(box);
 
                     loadApi().then(function () {
-                        if (popup !== box) return; // fermé ou remplacé entre-temps
+                        if (popup !== box) return;
                         player = new YT.Player(box.querySelector(".yt-clip-frame div"), {
                             videoId: btn.dataset.video,
                             playerVars: { start: Math.floor(start), end: Math.ceil(end), autoplay: 1, controls: 0, rel: 0, playsinline: 1 },
                             events: {
                                 onReady: function (e) { e.target.seekTo(start, true); e.target.playVideo(); },
                                 onStateChange: function (e) {
-                                    // On surveille le temps de lecture et on coupe le son pile à data-end
                                     if (e.data === YT.PlayerState.PLAYING && !watch) {
                                         var p = e.target;
                                         watch = setInterval(function () {
@@ -1272,15 +2197,10 @@
                             }
                         });
                     });
-                    // Au cas où la vidéo ne se lance pas
                     safety = setTimeout(closeClip, (end - start) * 1000 + 15000);
                 });
             });
         })();
     </script>
-<footer style="max-width: 700px; margin: 0 auto 50px; padding: 16px; text-align: center; font-size: 11px; color: #999999; border-top: 4px solid #000000;">
-    <a href="../../mentions-legales.html" style="color: #aaaaaa; text-decoration: none;">Mentions l&eacute;gales</a>
-</footer>
-
 </body>
 </html>

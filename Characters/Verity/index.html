@@ -5,40 +5,367 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/webp" href="Verity.webp">
     <title>Archive - Verity</title>
-    <link rel="stylesheet" href="../Verity/Verity.css">
+    <style>
+        @font-face {
+            font-family: 'Minecraftia';
+            src: local('Minecraftia'), url('../../Minecraftia.woff') format('woff');
+        }
+
+        html { scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar { display: none; }
+
+        :root {
+            --text-gray: #aaaaaa;
+            --gold: #ffcc33;
+            --red: #ff3b3b;
+            --pink: #e362c3;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Minecraftia', 'Courier New', monospace;
+            background: #050405;
+            color: #fff;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            image-rendering: pixelated;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        img { -webkit-user-drag: none; user-drag: none; }
+
+        .fx-vignette, .fx-grain, .fx-scan { position: fixed; inset: 0; pointer-events: none; z-index: 900; }
+        .fx-vignette { background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.85) 100%); }
+        .fx-scan { background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.18) 0 1px, transparent 1px 3px); mix-blend-mode: multiply; }
+        .fx-grain {
+            opacity: 0.07;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            animation: grain 0.6s steps(4) infinite;
+        }
+        @keyframes grain {
+            0% { transform: translate(0, 0); } 25% { transform: translate(-30px, 20px); }
+            50% { transform: translate(20px, -40px); } 75% { transform: translate(-10px, 30px); } 100% { transform: translate(0, 0); }
+        }
+        @keyframes caret { 50% { opacity: 0; } }
+
+        /* =========================================================
+           EN-TÊTE
+           ========================================================= */
+        .top {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 20px;
+            background: linear-gradient(#000, rgba(0,0,0,0));
+        }
+        .mc-btn {
+            display: inline-block;
+            font-family: inherit;
+            background: #555;
+            border: 3px solid #000;
+            box-shadow: inset 3px 3px 0 #ababab, inset -3px -3px 0 #353535;
+            padding: 10px 20px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 13px;
+            text-shadow: 2px 2px 0 #222;
+            cursor: pointer;
+        }
+        .mc-btn:hover { background: #7a2222; box-shadow: inset 3px 3px 0 #ba5555, inset -3px -3px 0 #3a0e0e; color: #fff; }
+        .title { text-align: center; flex: 1; }
+        .title h1 {
+            margin: 0;
+            font-weight: normal;
+            font-size: clamp(18px, 3vw, 28px);
+            color: var(--red);
+            text-shadow: 0 3px 0 #6a0000, 0 0 24px rgba(255, 0, 0, 0.4);
+        }
+        .title p { margin: 6px 0 0; font-size: 11px; color: var(--text-gray); letter-spacing: 1px; }
+        .title p .caret { display: inline-block; width: 7px; background: var(--red); animation: caret 0.8s steps(1) infinite; }
+        .top-spacer { width: 150px; }
+        @media (max-width: 700px) { .top { flex-direction: column; } .top-spacer { display: none; } }
+
+        /* =========================================================
+           LES DEUX TIMELINES
+           ========================================================= */
+        .split {
+            position: relative;
+            flex: 1;
+            display: flex;
+            min-height: 520px;
+            margin-top: -80px;
+        }
+        @media (max-width: 700px) { .split { flex-direction: column; margin-top: 0; } }
+
+        .side {
+            position: relative;
+            flex: 1 1 0;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 110px 24px 40px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            overflow: hidden;
+            outline: none;
+            transition: flex-grow 0.5s cubic-bezier(.2,.8,.2,1), filter 0.4s;
+        }
+        @media (max-width: 700px) { .side { min-height: 380px; padding-top: 40px; } }
+        .side > *:not(.bg) { position: relative; z-index: 2; }
+
+        .bg {
+            position: absolute;
+            inset: -4%;
+            background-size: cover;
+            background-position: center;
+            filter: grayscale(0.7) brightness(0.35);
+            transform: scale(1.02);
+            transition: filter 0.5s, transform 6s ease-out;
+        }
+        .bg::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+        }
+        .mob .bg  { background-image: url('Images/VerityInFrontOfMob.webp'); }
+        .grox .bg { background-image: url("Images/Grox'sLastPost.webp"); background-position: 62% 72%; }
+        .mob .bg::after  { background: linear-gradient(to top, rgba(40, 0, 0, 0.9), rgba(0,0,0,0.2) 60%), radial-gradient(ellipse at center, transparent, rgba(0,0,0,0.6)); }
+        .grox .bg::after { background: linear-gradient(to top, rgba(40, 0, 30, 0.9), rgba(0,0,0,0.2) 60%), radial-gradient(ellipse at center, transparent, rgba(0,0,0,0.6)); }
+
+        /* Le côté choisi s'élargit et reprend ses couleurs, l'autre s'éteint */
+        .split.has-focus .side { filter: brightness(0.45) saturate(0.4); }
+        .split.has-focus .side.active { flex-grow: 1.7; filter: none; }
+        .side.active .bg { filter: grayscale(0) brightness(0.55); transform: scale(1.1); }
+
+        /* Bordure lumineuse du côté choisi */
+        .side::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border: 4px solid transparent;
+            pointer-events: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            z-index: 3;
+        }
+        .mob.active::after  { border-color: var(--red);  box-shadow: inset 0 0 60px rgba(255, 0, 0, 0.35); }
+        .grox.active::after { border-color: var(--pink); box-shadow: inset 0 0 60px rgba(227, 98, 195, 0.35); }
+
+        /* La séparation au milieu */
+        .divider {
+            position: relative;
+            z-index: 5;
+            width: 6px;
+            background: #000;
+            box-shadow: 0 0 0 2px #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .divider span {
+            position: absolute;
+            background: #000;
+            border: 3px solid #333;
+            padding: 8px 10px;
+            font-size: 12px;
+            color: var(--text-gray);
+            white-space: nowrap;
+        }
+        @media (max-width: 700px) { .divider { width: auto; height: 6px; } }
+
+        /* Contenu de chaque côté */
+        .icon {
+            width: 120px;
+            height: 120px;
+            transition: transform 0.4s;
+        }
+        .side.active .icon { transform: scale(1.12); }
+        .mob .icon { filter: drop-shadow(0 0 24px rgba(255, 60, 0, 0.55)); }
+        .mob .icon img { width: 100%; height: 100%; display: block; }
+        .mob .icon .happy, .mob.active .icon .evil { display: block; }
+        .mob .icon .evil, .mob.active .icon .happy { display: none; }
+        .grox .icon { border: 4px solid #000; box-shadow: 0 0 30px rgba(227, 98, 195, 0.4), 8px 8px 0 rgba(0,0,0,0.5); }
+        .grox .icon canvas { width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+        .grox.active .icon { animation: grox-shake 0.3s steps(2) infinite; }
+        @keyframes grox-shake { 0% { transform: scale(1.12) rotate(0); } 50% { transform: scale(1.12) translate(-2px, 1px) rotate(-2deg); } 100% { transform: scale(1.12) translate(2px, -1px) rotate(2deg); } }
+
+        .stamp {
+            font-size: 11px;
+            padding: 5px 10px;
+            border: 3px solid currentColor;
+            background: rgba(0, 0, 0, 0.6);
+            letter-spacing: 2px;
+        }
+        .stamp.canon { color: #55ff55; }
+        .stamp.noncanon { color: #ff5555; transform: rotate(-4deg); }
+
+        .name {
+            font-size: clamp(20px, 3.4vw, 34px);
+            line-height: 1.3;
+            text-shadow: 3px 3px 0 #000;
+        }
+        .mob .name { color: var(--red); text-shadow: 0 3px 0 #5a0000, 0 0 24px rgba(255,0,0,0.4); }
+        .grox .name { color: var(--pink); text-shadow: 0 3px 0 #4a0f3c, 0 0 24px rgba(227,98,195,0.4); }
+        .name .emoji { font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif; font-size: 0.7em; text-shadow: none; }
+        .sub { font-size: 12px; color: var(--text-gray); text-shadow: 1px 1px 0 #000; }
+        .grox .sub { color: var(--gold); }
+
+        .meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            font-size: 10px;
+        }
+        .meta span {
+            padding: 4px 8px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #333;
+            color: #ddd;
+        }
+        .meta .live { color: var(--gold); }
+        .meta .live::before { content: "\25CF  "; animation: caret 1s steps(1) infinite; }
+
+        .load {
+            margin-top: 10px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #888;
+            padding: 8px 16px;
+            border: 3px solid #333;
+            background: rgba(0, 0, 0, 0.6);
+            transition: color 0.2s, border-color 0.2s, background 0.2s;
+        }
+        .mob.active .load  { color: #fff; border-color: var(--red);  background: #5a1010; }
+        .grox.active .load { color: #fff; border-color: var(--pink); background: #5a1a4a; }
+        .side.active .load::after { content: " \25B6"; animation: caret 0.8s steps(1) infinite; }
+
+        .hint {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            font-size: 10px;
+            color: #555;
+            padding: 12px;
+        }
+        @media (hover: none) { .hint { display: none; } }
+
+        /* Petit fondu en sortant de la page */
+        .leave { position: fixed; inset: 0; background: #000; z-index: 999; animation: fade-out 0.35s steps(4) both; }
+        @keyframes fade-out { from { opacity: 0; } to { opacity: 1; } }
+
+        footer { padding: 16px; text-align: center; font-size: 11px; border-top: 4px solid #000; position: relative; z-index: 10; }
+        footer a { color: #aaa; text-decoration: none; }
+        footer a:hover { color: var(--red); }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
 </head>
 <body>
 
-    <a href="../../" class="mc-btn-back">< BACK TO MENU</a>
+    <div class="fx-vignette"></div>
+    <div class="fx-scan"></div>
+    <div class="fx-grain"></div>
 
-    <div class="wiki-container">
-
-        <h1 class="wiki-title">Entity_File: Verity</h1>
-        <p class="wiki-subtitle">Two parallel timelines were recovered. Select one to load.</p>
-
-        <div class="tl-choices">
-            <a href="thatmob.html" class="tl-side tl-side-mob">
-                <span class="tl-bg" style="background-image: url('../Verity/Images/VerityInFrontOfMob.webp');"></span>
-                <span class="tl-stamp tl-stamp-canon">&#10004; CANON</span>
-                <span class="tl-name">ThatMob's Story</span>
-                <span class="tl-sub">(Canon)</span>
-                <span class="tl-hint">[ LOAD TIMELINE ]</span>
-            </a>
-
-            <a href="grox.html" class="tl-side tl-side-grox">
-                <span class="tl-bg" style="background-image: url('../Verity/Images/Grox.webp');"></span>
-                <span class="tl-stamp tl-stamp-noncanon">&#10006; NON-CANON</span>
-                <span class="tl-name">GROX'S STORY&#128483;&#65039;&#128511;</span>
-                <span class="tl-sub">AIGHT BET!</span>
-                <span class="tl-hint">[ LOAD TIMELINE ]</span>
-            </a>
+    <div class="top">
+        <a href="../../" class="mc-btn">&lt; BACK TO MENU</a>
+        <div class="title">
+            <h1>Entity_File: Verity</h1>
+            <p>Two parallel timelines were recovered. Select one to load.<span class="caret">&nbsp;</span></p>
         </div>
-
+        <div class="top-spacer"></div>
     </div>
 
-<footer style="max-width: 700px; margin: 0 auto 50px; padding: 16px; text-align: center; font-size: 11px; color: #999999; border-top: 4px solid #000000;">
-    <a href="../../mentions-legales.html" style="color: #aaaaaa; text-decoration: none;">Mentions l&eacute;gales</a>
-</footer>
+    <div class="split" id="split">
+        <a href="thatmob.html" class="side mob" data-index="0">
+            <span class="bg"></span>
+            <span class="icon">
+                <img class="happy" src="Images/Verity_happy_face.webp" alt="">
+                <img class="evil" src="Images/Verity_evil_face.png" alt="">
+            </span>
+            <span class="stamp canon">&#10004; CANON</span>
+            <span class="name">ThatMob's Story</span>
+            <span class="sub">(Canon)</span>
+            <span class="meta"><span>3 EPISODES</span><span>COMPLETE</span></span>
+            <span class="load">[ LOAD TIMELINE ]</span>
+        </a>
 
+        <div class="divider"><span>OR</span></div>
+
+        <a href="grox.html" class="side grox" data-index="1">
+            <span class="bg"></span>
+            <span class="icon"><canvas width="8" height="8" id="groxHead"></canvas></span>
+            <span class="stamp noncanon">&#10006; NON-CANON</span>
+            <span class="name">GROX'S STORY<span class="emoji">&#128483;&#65039;&#128511;</span></span>
+            <span class="sub">AIGHT BET!</span>
+            <span class="meta"><span>EPISODE 4</span><span class="live">COMING SOON</span></span>
+            <span class="load">[ LOAD TIMELINE ]</span>
+        </a>
+    </div>
+
+    <p class="hint">&#9664; &#9654; to choose &middot; ENTER to load</p>
+
+    <footer>
+        <a href="../../mentions-legales.html">Mentions l&eacute;gales</a>
+    </footer>
+
+    <script>
+        // Tête de Grox tirée de son skin (visage + calque du chapeau)
+        (function () {
+            var skin = new Image();
+            skin.onload = function () {
+                var ctx = document.getElementById("groxHead").getContext("2d");
+                ctx.imageSmoothingEnabled = false;
+                ctx.drawImage(skin, 8, 8, 8, 8, 0, 0, 8, 8);
+                ctx.drawImage(skin, 40, 8, 8, 8, 0, 0, 8, 8);
+            };
+            skin.src = "../Creator/Skins/Grox.png";
+        })();
+
+        // Choix d'un côté : souris, ou flèches + Entrée comme dans un menu de jeu
+        (function () {
+            var split = document.getElementById("split");
+            var sides = split.querySelectorAll(".side");
+            var current = -1;
+
+            function select(i) {
+                current = i;
+                split.classList.toggle("has-focus", i >= 0);
+                sides.forEach(function (s, k) { s.classList.toggle("active", k === i); });
+            }
+            sides.forEach(function (s, i) {
+                s.addEventListener("mouseenter", function () { select(i); });
+                s.addEventListener("focus", function () { select(i); });
+                s.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    var d = document.createElement("div");
+                    d.className = "leave";
+                    document.body.appendChild(d);
+                    setTimeout(function () { location.href = s.getAttribute("href"); }, 300);
+                });
+            });
+            split.addEventListener("mouseleave", function () { select(-1); });
+
+            addEventListener("keydown", function (e) {
+                if (e.key === "ArrowLeft" || e.key === "ArrowUp") { select(0); e.preventDefault(); }
+                else if (e.key === "ArrowRight" || e.key === "ArrowDown") { select(1); e.preventDefault(); }
+                else if (e.key === "Enter" && current >= 0) sides[current].click();
+            });
+
+            // Si on revient en arrière, on enlève le fondu noir
+            addEventListener("pageshow", function () { document.querySelectorAll(".leave").forEach(function (d) { d.remove(); }); });
+        })();
+    </script>
 </body>
 </html>

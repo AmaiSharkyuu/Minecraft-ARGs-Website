@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/webp" href="Characters/Verity/Verity.webp">
-
     <title>[ERR] - Void Archives</title>
     <style>
         @font-face {
@@ -12,302 +11,564 @@
             src: local('Minecraftia'), url('Minecraftia.woff') format('woff');
         }
 
+        html { scrollbar-width: none; -ms-overflow-style: none; }
+        html::-webkit-scrollbar { display: none; }
+
         :root {
-            /* 🌍 THÈME PAR DÉFAUT (CIEL / BLEU) */
-            --bg-image: url('Ciel.png');
-            --bg-overlay: rgba(135, 206, 235, 0.3);
-            --bg-color: #4da6ff;
-            
-            --bg-size: cover;
-            --bg-repeat: no-repeat;
-            --bg-attachment: fixed;
-            --bg-position: center;
-            
-            --mc-panel: #222222;
-            --mc-panel-light: #3c3c3c;
-            --mc-panel-dark: #121212;
-            
-            --theme-primary: #55ffff;
-            --theme-secondary: #aaaaaa;
-            --theme-header-shadow: #004466;
-            
-            --theme-hover-bg: #1a2a3a;
-            --theme-hover-border: #ffffff;
-            --theme-hover-shadow-light: #11334a;
-            --theme-hover-shadow-dark: #0a1a2a;
+            --accent: #55ffff;
+            --accent-dark: #004466;
+            --gray: #aaaaaa;
         }
+        body.theme-red    { --accent: #ff5555; --accent-dark: #3f0000; }
+        body.theme-yellow { --accent: #ffff55; --accent-dark: #3f3f00; }
 
-        /* 🔴 THÈME ROUGE (Appliqué via la classe .active-red sur body) */
-        body.active-red {
-            --bg-image: url('netherrack.png'); 
-            --bg-overlay: rgba(0, 0, 0, 0.85);
-            --bg-color: #0b0b0b;
-            
-            --bg-size: 64px;
-            --bg-repeat: repeat;
-            --bg-attachment: scroll;
-            --bg-position: top left;
-            
-            --theme-primary: #ff5555;
-            --theme-secondary: #ffaa00;
-            --theme-header-shadow: #3f0000;
-            
-            --theme-hover-bg: #2a1a1a;
-            --theme-hover-border: #ffffff;
-            --theme-hover-shadow-light: #4a1111;
-            --theme-hover-shadow-dark: #1a0a0a;
-        }
-
-        /* 🟡 THÈME JAUNE (Appliqué via la classe .active-yellow sur body) */
-        body.active-yellow {
-            --bg-image: url('Ciel.png');
-            --bg-overlay: rgba(20, 20, 0, 0.85);
-            --bg-color: #1a1a0b;
-            
-            --bg-size: cover;
-            --bg-repeat: no-repeat;
-            --bg-attachment: fixed;
-            --bg-position: center;
-            
-            --theme-primary: #ffff55;
-            --theme-secondary: #ffaa00;
-            --theme-header-shadow: #3f3f00;
-            
-            --theme-hover-bg: #2a2a1a;
-            --theme-hover-border: #ffff55;
-            --theme-hover-shadow-light: #4a4a11;
-            --theme-hover-shadow-dark: #1a1a0a;
-        }
+        * { box-sizing: border-box; }
 
         body {
             font-family: 'Minecraftia', 'Courier New', monospace;
-            background-color: var(--bg-color);
-            background-image: linear-gradient(var(--bg-overlay), var(--bg-overlay)), var(--bg-image);
-            
-            background-size: var(--bg-size);
-            background-repeat: var(--bg-repeat);
-            background-attachment: var(--bg-attachment);
-            background-position: var(--bg-position);
-            
-            image-rendering: pixelated;
-            color: #ffffff;
+            background: #000;
+            color: #fff;
             margin: 0;
-            padding: 0;
-            
-            transition: background-color 0.3s, background-image 0.3s, background-size 0.3s;
-            
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        img {
-            -webkit-user-drag: none;
-            user-drag: none;
-            pointer-events: none;
-        }
-
-        header {
-            background: #000000;
-            border-bottom: 4px solid #000000;
-            padding: 25px;
-            text-align: center;
-            box-shadow: inset 0 -4px 0 var(--theme-header-shadow);
-            transition: box-shadow 0.3s;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 26px;
-            color: var(--theme-primary);
-            text-shadow: 3px 3px 0px var(--theme-header-shadow);
-            transition: color 0.3s, text-shadow 0.3s;
-        }
-
-        .container {
-            max-width: 700px;
-            margin: 50px auto;
-            background: var(--mc-panel);
-            border: 4px solid #000000;
-            box-shadow: inset 4px 4px 0px var(--mc-panel-light), 
-                        inset -4px -4px 0px var(--mc-panel-dark);
-            padding: 25px;
-        }
-
-        h2 {
-            font-size: 18px;
-            color: #aaaaaa;
-            text-align: center;
-            margin-top: 0;
-            margin-bottom: 25px;
-            text-shadow: 2px 2px 0px #222;
-        }
-
-        .char-list {
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            overflow-x: hidden;
+            image-rendering: pixelated;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+
+        /* =========================================================
+           PANORAMA : ciel par défaut, il se corrompt selon le monde survolé
+           ========================================================= */
+        .pano {
+            position: fixed;
+            inset: -8%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            animation: pan 60s ease-in-out infinite alternate;
+            z-index: -2;
+        }
+        .pano.on { opacity: 1; }
+        @keyframes pan {
+            from { transform: scale(1.05) translateX(-3%); }
+            to   { transform: scale(1.12) translateX(3%); }
+        }
+        /* Le vrai panorama de l'écran titre (1.20.1) : un cube autour de la caméra qui tourne lentement */
+        .cube-scene {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: -3;
+            background: #6a8ab8;
+        }
+        .cube {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 0;
+            height: 0;
+            transform-style: preserve-3d;
+        }
+        .cube > div {
+            position: absolute;
+            width: 2052px;
+            height: 2052px;
+            margin: -1026px 0 0 -1026px;
+            background-size: 100% 100%;
+            image-rendering: auto;
+            backface-visibility: hidden;
+        }
+        .cube .f0 { background-image: url('Panorama/panorama_0.webp'); transform: translateZ(-1024px); }
+        .cube .f1 { background-image: url('Panorama/panorama_1.webp'); transform: rotateY(-90deg) translateZ(-1024px); }
+        .cube .f2 { background-image: url('Panorama/panorama_2.webp'); transform: rotateY(180deg) translateZ(-1024px); }
+        .cube .f3 { background-image: url('Panorama/panorama_3.webp'); transform: rotateY(90deg) translateZ(-1024px); }
+        .cube .f4 { background-image: url('Panorama/panorama_4.webp'); transform: rotateX(-90deg) translateZ(-1024px); }
+        .cube .f5 { background-image: url('Panorama/panorama_5.webp'); transform: rotateX(90deg) translateZ(-1024px); }
+        /* le panorama s'éteint quand un monde est survolé */
+        .cube-scene { transition: filter 0.8s; }
+        body.theme-red .cube-scene, body.theme-yellow .cube-scene { filter: brightness(0.3) saturate(0.5); }
+        .pano-verity  { background-image: url('Characters/Verity/Images/evil_verity.webp'); filter: brightness(0.45) saturate(1.2); }
+        .pano-creator { background-image: url('Characters/Creator/Images/here.webp'); filter: brightness(0.45) saturate(1.3); }
+        .pano-king    { background-image: url('Characters/TheKingInYellow/Thekinginyellowtrueform.webp'); filter: brightness(0.5) sepia(0.3); }
+        .pano-tint {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+            transition: background 0.8s;
+        }
+        body.theme-red .pano-tint    { background: radial-gradient(ellipse at center, rgba(60,0,0,0.25) 30%, rgba(0,0,0,0.9) 100%); }
+        body.theme-yellow .pano-tint { background: radial-gradient(ellipse at center, rgba(40,40,0,0.2) 30%, rgba(0,0,0,0.85) 100%); }
+
+        /* Grain et lignes d'écran : invisibles dans le ciel, ils apparaissent quand ça devient sombre */
+        .fx-grain, .fx-scan { position: fixed; inset: 0; pointer-events: none; z-index: 900; opacity: 0; transition: opacity 0.6s; }
+        .fx-scan { background: repeating-linear-gradient(to bottom, rgba(0,0,0,0.2) 0 1px, transparent 1px 3px); mix-blend-mode: multiply; }
+        .fx-grain {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            animation: grain 0.6s steps(4) infinite;
+        }
+        body.theme-red .fx-grain, body.theme-yellow .fx-grain { opacity: 0.09; }
+        body.theme-red .fx-scan, body.theme-yellow .fx-scan { opacity: 1; }
+        @keyframes grain {
+            0% { transform: translate(0, 0); } 25% { transform: translate(-30px, 20px); }
+            50% { transform: translate(20px, -40px); } 75% { transform: translate(-10px, 30px); } 100% { transform: translate(0, 0); }
         }
 
-        .char-link {
-            text-decoration: none;
-            display: block;
+        /* =========================================================
+           LOGO + SPLASH (écran titre)
+           ========================================================= */
+        .title {
+            position: relative;
+            text-align: center;
+            padding: 50px 16px 10px;
+        }
+        .logo-wrap { position: relative; display: inline-block; }
+        .logo {
+            position: relative;
+            margin: 0;
+            font-weight: normal;
+            font-size: clamp(26px, 6.4vw, 64px);
+            line-height: 1.15;
+            color: #e8e8e8;
+            letter-spacing: 1px;
+            text-shadow:
+                0 3px 0 #9a9a9a,
+                0 6px 0 #6a6a6a,
+                0 9px 0 #3a3a3a,
+                0 12px 0 #111,
+                0 0 40px rgba(0, 0, 0, 0.4);
+            transition: color 0.4s;
+        }
+        .logo sup { font-size: 0.35em; color: #aa0000; text-shadow: 1px 1px 0 #000; vertical-align: top; margin-right: 6px; }
+        body.theme-red .logo {
+            color: #ff4545;
+            text-shadow: 0 3px 0 #a00000, 0 6px 0 #700000, 0 9px 0 #400000, 0 12px 0 #1a0000, 0 0 50px rgba(255,0,0,0.5);
+        }
+        body.theme-yellow .logo {
+            color: #ffff66;
+            text-shadow: 0 3px 0 #b0a000, 0 6px 0 #706600, 0 9px 0 #403a00, 0 12px 0 #1a1800, 0 0 50px rgba(255,255,0,0.35);
+        }
+        .logo::before, .logo::after {
+            content: attr(data-text);
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            text-shadow: none;
+        }
+        .logo::before { color: #00ffff; }
+        .logo::after  { color: #ff00ff; }
+        .logo.glitch::before { animation: glitch-a 0.35s steps(1) both; }
+        .logo.glitch::after  { animation: glitch-b 0.35s steps(1) both; }
+        @keyframes glitch-a {
+            0%   { opacity: 0.8; clip-path: inset(10% 0 70% 0); transform: translate(-6px, 0); }
+            30%  { clip-path: inset(60% 0 10% 0); transform: translate(5px, 0); }
+            60%  { clip-path: inset(30% 0 45% 0); transform: translate(-3px, 0); }
+            100% { opacity: 0; }
+        }
+        @keyframes glitch-b {
+            0%   { opacity: 0.8; clip-path: inset(70% 0 5% 0); transform: translate(6px, 0); }
+            40%  { clip-path: inset(15% 0 60% 0); transform: translate(-5px, 0); }
+            70%  { clip-path: inset(45% 0 30% 0); transform: translate(2px, 0); }
+            100% { opacity: 0; }
+        }
+        .splash {
+            position: absolute;
+            right: -6%;
+            bottom: 2%;
+            color: #ffff55;
+            font-size: clamp(10px, 1.6vw, 16px);
+            white-space: nowrap;
+            text-shadow: 2px 2px 0 #3f3f00;
+            animation: splash 0.45s ease-in-out infinite alternate;
+        }
+        @keyframes splash {
+            from { transform: rotate(-16deg) scale(0.92); }
+            to   { transform: rotate(-16deg) scale(1.04); }
+        }
+        .sub {
+            margin: 30px 0 0;
+            font-size: 11px;
+            color: #fff;
+            text-shadow: 2px 2px 0 #000;
+            letter-spacing: 2px;
         }
 
-        .character-box {
+        /* =========================================================
+           ÉCRAN « SELECT WORLD »
+           ========================================================= */
+        .screen-title {
+            text-align: center;
+            margin: 28px 0 10px;
+            font-size: 14px;
+            color: #fff;
+            text-shadow: 2px 2px 0 #3f3f3f;
+        }
+        .worlds {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            border-top: 2px solid #000;
+            border-bottom: 2px solid #000;
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.08), inset 0 -2px 0 rgba(255,255,255,0.08);
+            padding: 14px 16px;
+        }
+        .list { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 6px; }
+
+        .world {
             display: flex;
-            gap: 20px;
-            background: #1a1a1a;
-            border: 4px solid #000000;
-            box-shadow: inset 3px 3px 0px #111111, inset -3px -3px 0px #2a2a2a;
-            padding: 15px;
+            gap: 14px;
             align-items: center;
-            transition: all 0.2s;
+            padding: 6px;
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: #fff;
+            outline: none;
+            cursor: pointer;
         }
+        .world.selected { border-color: #a0a0a0; background: rgba(0, 0, 0, 0.6); }
+        body.theme-red .world.selected    { border-color: #ff5555; box-shadow: 0 0 16px rgba(255, 0, 0, 0.35); }
+        body.theme-yellow .world.selected { border-color: #ffff55; box-shadow: 0 0 16px rgba(255, 255, 0, 0.25); }
 
-        body.active-red .char-link.theme-red:hover .character-box {
-            background: var(--theme-hover-bg);
-            border-color: var(--theme-hover-border);
-            box-shadow: inset 3px 3px 0px var(--theme-hover-shadow-light), 
-                        inset -3px -3px 0px var(--theme-hover-shadow-dark);
-        }
-
-        body.active-yellow .char-link.theme-yellow:hover .character-box {
-            background: var(--theme-hover-bg);
-            border-color: var(--theme-hover-border);
-            box-shadow: inset 3px 3px 0px var(--theme-hover-shadow-light), 
-                        inset -3px -3px 0px var(--theme-hover-shadow-dark);
-        }
-
-        .char-img-slot {
+        /* Icône 64x64 avec la flèche ▶ au survol, comme dans Minecraft */
+        .icon {
+            position: relative;
             width: 64px;
             height: 64px;
-            background: #000000;
-            border: 4px solid #373737;
-            border-top-color: #222222;
-            border-left-color: #222222;
+            flex-shrink: 0;
+            background: #000;
+            border: 1px solid #000;
+            overflow: hidden;
+        }
+        .icon img { width: 100%; height: 100%; display: block; object-fit: cover; }
+        .icon .alt { position: absolute; inset: 0; opacity: 0; }
+        .world.selected .icon .alt { opacity: 1; }
+        .icon::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'%3E%3Cpath fill='%23fff' d='M2 1h1v6H2zM3 2h1v4H3zM4 3h1v2H4z'/%3E%3C/svg%3E") center / 32px 32px no-repeat;
+            opacity: 0;
+        }
+        .world.selected .icon::after { opacity: 1; }
+
+        .info { display: block; flex: 1; min-width: 0; line-height: 1.6; }
+        .info > span { display: block; }
+        .info .name { font-size: 15px; color: #fff; }
+        .info .line { font-size: 11px; color: #808080; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .info .mode { font-size: 11px; color: #808080; }
+        .info .mode .horror { color: #ff5555; }
+        .info .mode .arg { color: #ffff55; }
+        .world.selected .info .name { color: var(--accent); text-shadow: 2px 2px 0 var(--accent-dark); }
+
+        /* Boutons du bas, comme l'écran de sélection de Minecraft */
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            max-width: 640px;
+            margin: 14px auto 0;
+            padding: 0 16px;
+        }
+        .mc-btn {
+            display: block;
+            text-align: center;
+            font-family: inherit;
+            background: #6f6f6f;
+            border: 2px solid #000;
+            box-shadow: inset 2px 2px 0 #aaaaaa, inset -2px -2px 0 #3c3c3c;
+            padding: 10px 12px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 13px;
+            text-shadow: 2px 2px 0 #383838;
+            cursor: pointer;
+        }
+        .mc-btn:hover { background: #7e86b8; box-shadow: inset 2px 2px 0 #bec6ff, inset -2px -2px 0 #3a4170; color: #ffffa0; }
+        body.theme-red .mc-btn:hover    { background: #8a2a2a; box-shadow: inset 2px 2px 0 #d06060, inset -2px -2px 0 #3a0e0e; color: #fff; }
+        body.theme-yellow .mc-btn:hover { background: #8a8020; box-shadow: inset 2px 2px 0 #d8d060, inset -2px -2px 0 #3a360a; color: #fff; }
+        .mc-btn.disabled { background: #2c2c2c; box-shadow: none; color: #6a6a6a; text-shadow: none; pointer-events: none; }
+        .mc-btn.wide { grid-column: 1 / -1; }
+
+        /* Note d'Amai : un petit papier épinglé */
+        .note-wrap { padding: 0 16px; }
+        .note {
+            position: relative;
+            max-width: 600px;
+            margin: 26px auto 0;
+            padding: 22px 24px 18px;
+            background: #e9dcb6;
+            color: #3a2a14;
+            border: 4px solid #000;
+            box-shadow: inset 0 0 0 4px #b89a60, 8px 8px 0 rgba(0,0,0,0.5);
+            font-size: 11px;
+            line-height: 1.9;
+            transform: rotate(-0.8deg);
+            transition: transform 0.3s;
+        }
+        .note:hover { transform: rotate(0deg) scale(1.01); }
+        /* l'épingle rouge */
+        .note::before {
+            content: "";
+            position: absolute;
+            top: -13px;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin-left: -8px;
+            background: #c81e1e;
+            border: 3px solid #000;
+            box-shadow: inset -3px -3px 0 #7a0e0e;
+        }
+        .note h2 { margin: 0 0 8px; font-weight: normal; font-size: 13px; color: #5a3a00; }
+        .note p { margin: 0 0 8px; }
+        .note p:last-child { margin: 0; text-align: right; color: #5a3a00; }
+        .note b { color: #8a1010; font-weight: normal; }
+
+        .spacer { flex: 1; min-height: 30px; }
+        .corner {
             display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px;
+            font-size: 10px;
+            color: #fff;
+            text-shadow: 2px 2px 0 #3f3f3f;
+        }
+
+        /* Petit fondu au noir en chargeant un monde */
+        .loading {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            flex-shrink: 0;
+            gap: 14px;
+            background: #000 url('netherrack.png') 0 0 / 64px;
+            font-size: 13px;
+            text-shadow: 2px 2px 0 #3f3f3f;
         }
+        .loading::before { content: ""; position: absolute; inset: 0; background: rgba(0,0,0,0.75); }
+        .loading p { position: relative; margin: 0; }
+        .loading .bar { position: relative; width: 200px; height: 4px; background: #808080; }
+        .loading .bar span { display: block; height: 100%; width: 0; background: #80ff20; animation: load 0.5s steps(8) forwards; }
+        @keyframes load { to { width: 100%; } }
 
-        .char-img-slot img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            image-rendering: pixelated;
+        @media (max-width: 560px) {
+            .buttons { grid-template-columns: 1fr; }
+            .splash { right: 0; bottom: -10%; }
+            .icon { width: 52px; height: 52px; }
         }
-
-        .char-details {
-            flex: 1;
-        }
-
-        .char-name {
-            font-size: 18px;
-            color: var(--theme-primary);
-            margin: 0 0 5px 0;
-            text-shadow: 2px 2px 0px var(--theme-header-shadow);
-            transition: color 0.3s;
-        }
-
-        body.active-red .char-link.theme-red:hover .char-name,
-        body.active-yellow .char-link.theme-yellow:hover .char-name {
-            color: #ffffff;
-            text-shadow: 2px 2px 0px var(--theme-primary);
-        }
-
-        .char-btn-desc {
-            font-size: 12px;
-            color: var(--theme-secondary);
-            margin: 0;
-            text-shadow: 1px 1px 0px #111;
-            transition: color 0.3s;
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1 id="headerTitle">§4MINECRAFT_ARG.JAR</h1>
+    <div class="cube-scene" id="cubeScene">
+        <div class="cube" id="cube">
+            <div class="f0"></div><div class="f1"></div><div class="f2"></div>
+            <div class="f3"></div><div class="f4"></div><div class="f5"></div>
+        </div>
+    </div>
+    <div class="pano pano-verity" data-pano="verity"></div>
+    <div class="pano pano-creator" data-pano="creator"></div>
+    <div class="pano pano-king" data-pano="king"></div>
+    <div class="pano-tint"></div>
+    <div class="fx-scan"></div>
+    <div class="fx-grain"></div>
+
+    <header class="title">
+        <div class="logo-wrap">
+            <h1 class="logo" id="logo" data-text="MINECRAFT_ARG.JAR"><sup>&sect;4</sup><span id="logoText">MINECRAFT_ARG.JAR</span></h1>
+            <span class="splash" id="splash">Now with 100% more horror!</span>
+        </div>
+        <p class="sub">VOID ARCHIVES &middot; RECOVERED SAVE FILES</p>
     </header>
 
-    <div class="container">
-        <h2>SELECT REPORT DATA</h2>
+    <p class="screen-title">Select Report Data</p>
 
-        <div class="char-list" id="charList">
-            
-            <a href="Characters/Verity/" class="char-link theme-red">
-                <div class="character-box">
-                    <div class="char-img-slot">
-                        <img src="Characters/Verity/Verity.webp" alt="Skin">
-                    </div>
-                    <div class="char-details">
-                        <h3 class="char-name">Verity</h3>
-                        <p class="char-btn-desc">Hello! I'm Verity, your personnal helper friend!</p>
-                    </div>
-                </div>
+    <div class="worlds">
+        <div class="list" id="list">
+
+            <a href="Characters/Verity/" class="world" data-theme="red" data-pano="verity" data-logo="MINECRAFT_HORROR.JAR">
+                <span class="icon">
+                    <img src="Characters/Verity/Images/Verity_happy_face.webp" alt="">
+                    <img class="alt" src="Characters/Verity/Images/Verity_evil_face.png" alt="">
+                </span>
+                <span class="info">
+                    <span class="name">Verity</span>
+                    <span class="line">Hello! I'm Verity, your personal helper friend!</span>
+                    <span class="mode"><span class="horror">Horror</span>, 3 episodes + Grox's timeline</span>
+                </span>
             </a>
 
-            <a href="Characters/Creator/" class="char-link theme-red">
-                <div class="character-box">
-                    <div class="char-img-slot">
-                        <img src="https://i.ibb.co/NdzwLT5j/Design-sans-titre-5.png" alt="Skin">
-                    </div>
-                    <div class="char-details">
-                        <h3 class="char-name">Creator</h3>
-                        <p class="char-btn-desc">[ CLICK TO OPEN LOG ]</p>
-                    </div>
-                </div>
+            <a href="Characters/Creator/" class="world" data-theme="red" data-pano="creator" data-logo="MINECRAFT_HORROR.JAR">
+                <span class="icon"><img src="Characters/Creator/Creator.png" alt="" style="object-position: 60% 45%; transform: scale(1.8); transform-origin: 60% 50%;"></span>
+                <span class="info">
+                    <span class="name">Creator</span>
+                    <span class="line">Something is Already Here... (Twixxel)</span>
+                    <span class="mode"><span class="horror">Horror</span>, story in progress</span>
+                </span>
             </a>
 
-            <a href="Characters/TheKingInYellow/" class="char-link theme-yellow">
-                <div class="character-box">
-                    <div class="char-img-slot" style="background-color: #ffffff;">
-                        <img src="https://i.ibb.co/99yNkzK1/Design-sans-titre-3.png" alt="Skin">
-                    </div>
-                    <div class="char-details">
-                        <h3 class="char-name">The King in Yellow</h3>
-                        <p class="char-btn-desc">[ CLICK TO OPEN LOG ]</p>
-                    </div>
-                </div>
+            <a href="Characters/TheKingInYellow/" class="world" data-theme="yellow" data-pano="king" data-logo="MINECRAFT_ARG.JAR">
+                <span class="icon"><img src="Characters/TheKingInYellow/Thekinginyellowtrueform.webp" alt="" style="object-position: 50% 55%; transform: scale(1.6);"></span>
+                <span class="info">
+                    <span class="name">The King in Yellow</span>
+                    <span class="line">Investigated by Wifies, Lost Save Analysis</span>
+                    <span class="mode"><span class="arg">ARG</span>, not horror</span>
+                </span>
             </a>
+
         </div>
     </div>
 
+    <div class="buttons">
+        <a href="#" class="mc-btn wide disabled" id="play">Play Selected World</a>
+        <a href="mentions-legales.html" class="mc-btn">Mentions l&eacute;gales</a>
+        <a href="#" class="mc-btn" id="random">Random World</a>
+    </div>
+
+    <div class="note-wrap">
+        <div class="note">
+            <h2>A note from Amai</h2>
+            <p>Archiving these videos takes me a lot of time: about <b>3 hours for every 25 minutes of video</b>, between trying to understand everything and writing down only what is correct.</p>
+            <p>I do this for fun, on my free time. That is why some stories are not fully archived (The King in Yellow episodes are more than an hour long each), and why new parts can take a while to come out.</p>
+            <p>Thanks for reading! - Amai</p>
+        </div>
+    </div>
+
+    <div class="spacer"></div>
+
+    <div class="corner">
+        <span>Void Archives 1.20.1</span>
+        <span>Archived by Amai</span>
+    </div>
+
     <script>
-        const body = document.body;
-        const charList = document.getElementById('charList');
-        const characters = document.querySelectorAll('.char-link');
-        const headerTitle = document.getElementById('headerTitle');
+        var CALM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-        characters.forEach(char => {
-            char.addEventListener('mouseenter', () => {
-                if (char.classList.contains('theme-red')) {
-                    // C'est un personnage d'horreur
-                    headerTitle.textContent = "§4MINECRAFT_HORROR.JAR";
-                    body.classList.remove('active-yellow');
-                    body.classList.add('active-red');
-                } else if (char.classList.contains('theme-yellow')) {
-                    // C'est The King in Yellow (ARG seulement, pas horreur)
-                    headerTitle.textContent = "§4MINECRAFT_ARG.JAR";
-                    body.classList.remove('active-red');
-                    body.classList.add('active-yellow');
+        // Texte jaune au hasard, comme sur l'écran titre
+        // Rotation du panorama, comme sur l'écran titre de Minecraft
+        (function () {
+            var scene = document.getElementById("cubeScene");
+            var cube = document.getElementById("cube");
+            var FOV = 75, yaw = 0, last = performance.now();
+            function fit() {
+                var p = innerHeight / 2 / Math.tan(FOV * Math.PI / 360);
+                scene.style.perspective = p + "px";
+                cube.dataset.p = p;
+            }
+            function frame(now) {
+                yaw = (yaw + (now - last) * 0.0045) % 360;
+                last = now;
+                cube.style.transform = "translateZ(" + cube.dataset.p + "px) rotateX(" + (8 + Math.sin(now / 9000) * 3).toFixed(2) + "deg) rotateY(" + yaw.toFixed(3) + "deg)";
+                if (!CALM) requestAnimationFrame(frame);
+            }
+            fit();
+            addEventListener("resize", fit);
+            requestAnimationFrame(frame);
+        })();
+
+        var SPLASHES = [
+            "Now with 100% more horror!",
+            "Don't give it permission!",
+            "Ask me anything!",
+            "AIGHT BET!",
+            "Something is Already Here!",
+            "Don't turn left!",
+            "It becomes interested!",
+            "Recovered from level.dat!"
+        ];
+        document.getElementById("splash").textContent = SPLASHES[Math.floor(Math.random() * SPLASHES.length)];
+
+        (function () {
+            var body = document.body;
+            var logo = document.getElementById("logo");
+            var logoText = document.getElementById("logoText");
+            var play = document.getElementById("play");
+            var worlds = Array.prototype.slice.call(document.querySelectorAll(".world"));
+            var panos = document.querySelectorAll(".pano");
+            var current = null;
+
+            function glitch() {
+                if (CALM) return;
+                logo.classList.remove("glitch");
+                void logo.offsetWidth;
+                logo.classList.add("glitch");
+            }
+
+            function setLogo(text) {
+                if (logoText.textContent === text) return;
+                logoText.textContent = text;
+                logo.dataset.text = text;
+                glitch();
+            }
+
+            function select(w) {
+                current = w;
+                worlds.forEach(function (x) { x.classList.toggle("selected", x === w); });
+                body.classList.remove("theme-red", "theme-yellow");
+                var pano = "sky";
+                if (w) {
+                    body.classList.add("theme-" + w.dataset.theme);
+                    pano = w.dataset.pano;
+                    setLogo(w.dataset.logo);
+                    play.classList.remove("disabled");
+                    play.textContent = "Play: " + w.querySelector(".name").textContent;
+                } else {
+                    setLogo("MINECRAFT_ARG.JAR");
+                    play.classList.add("disabled");
+                    play.textContent = "Play Selected World";
                 }
+                panos.forEach(function (p) { p.classList.toggle("on", p.dataset.pano === pano); });
+            }
+
+            function load(w) {
+                var d = document.createElement("div");
+                d.className = "loading";
+                d.innerHTML = '<p>Loading world</p><div class="bar"><span></span></div><p></p>';
+                d.lastChild.textContent = w.querySelector(".name").textContent;
+                body.appendChild(d);
+                setTimeout(function () { location.href = w.getAttribute("href"); }, 550);
+            }
+
+            worlds.forEach(function (w) {
+                w.addEventListener("mouseenter", function () { select(w); });
+                w.addEventListener("focus", function () { select(w); });
+                w.addEventListener("click", function (e) { e.preventDefault(); select(w); load(w); });
             });
-        });
+            document.getElementById("list").addEventListener("mouseleave", function () { select(null); });
 
-        // Remet tout par défaut (y compris le titre ARG original) quand on sort de la boîte
-        charList.addEventListener('mouseleave', () => {
-            body.classList.remove('active-red', 'active-yellow');
-            headerTitle.textContent = "§4MINECRAFT_ARG.JAR";
-        });
+            play.addEventListener("click", function (e) { e.preventDefault(); if (current) load(current); });
+            document.getElementById("random").addEventListener("click", function (e) {
+                e.preventDefault();
+                var w = worlds[Math.floor(Math.random() * worlds.length)];
+                select(w);
+                setTimeout(function () { load(w); }, 400);
+            });
+
+            // Clavier : flèches haut/bas pour choisir, Entrée pour charger
+            addEventListener("keydown", function (e) {
+                var i = worlds.indexOf(current);
+                if (e.key === "ArrowDown") { select(worlds[(i + 1) % worlds.length]); e.preventDefault(); }
+                else if (e.key === "ArrowUp") { select(worlds[(i - 1 + worlds.length) % worlds.length]); e.preventDefault(); }
+                else if (e.key === "Enter" && current) load(current);
+            });
+
+            // En revenant en arrière, on enlève l'écran de chargement
+            addEventListener("pageshow", function () { document.querySelectorAll(".loading").forEach(function (d) { d.remove(); }); });
+
+            // De temps en temps, le logo grésille quand un monde d'horreur est sélectionné
+            if (!CALM) setInterval(function () { if (body.classList.contains("theme-red") && Math.random() < 0.6) glitch(); }, 2200);
+        })();
     </script>
-
-<footer style="max-width: 700px; margin: 0 auto 50px; padding: 16px; text-align: center; font-size: 11px; color: #999999; border-top: 4px solid #000000;">
-    <a href="mentions-legales.html" style="color: #aaaaaa; text-decoration: none;">Mentions l&eacute;gales</a>
-</footer>
-
 </body>
 </html>
