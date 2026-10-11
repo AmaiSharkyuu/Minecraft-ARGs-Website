@@ -271,6 +271,115 @@
             border-left: 2px solid #444;
         }
 
+        /* --- EXTRAITS AUDIO (bouton ▶ PLAY + mini-lecteur) --- */
+        .yt-clip {
+            font-family: inherit;
+            font-size: 10px;
+            font-style: normal;
+            color: var(--text-white);
+            background: #3c3c3c;
+            border: 2px solid #000;
+            box-shadow: inset 2px 2px 0 #5a5a5a, inset -2px -2px 0 #1e1e1e;
+            padding: 2px 6px;
+            margin-left: 6px;
+            cursor: pointer;
+            vertical-align: middle;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .yt-clip:hover {
+            color: var(--text-red);
+            text-shadow: 0 0 4px #ff5555;
+        }
+
+        .yt-clip-player {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            z-index: 1000;
+            width: 260px;
+            max-width: calc(100% - 32px);
+            background: var(--mc-panel);
+            border: 4px solid #000;
+            box-shadow: inset 4px 4px 0 var(--mc-panel-light),
+                        inset -4px -4px 0 var(--mc-panel-dark);
+            padding: 8px;
+            cursor: pointer;
+            animation: dlg-static 0.4s linear both;
+        }
+
+        .yt-clip-player .file-name {
+            margin: 0 0 6px 0;
+            font-size: 11px;
+        }
+
+        .yt-clip-frame {
+            aspect-ratio: 16 / 9;
+            border: 2px solid #000;
+            background: #000;
+        }
+
+        .yt-clip-frame iframe {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border: 0;
+        }
+
+        /* --- ANIMATIONS DES DIALOGUES (une au hasard à chaque ouverture/fermeture) --- */
+        .quote-text.anim-out { animation-direction: reverse !important; }
+
+        /* Glitch : le texte apparaît par tranches qui sautent */
+        .quote-text.anim-glitch { animation: dlg-glitch 0.5s steps(1) both; }
+        @keyframes dlg-glitch {
+            0%   { opacity: 0; clip-path: inset(0 0 100% 0); }
+            10%  { opacity: 1; clip-path: inset(10% 0 60% 0); transform: translateX(-6px); filter: drop-shadow(3px 0 #ff0000); }
+            20%  { clip-path: inset(50% 0 20% 0); transform: translateX(5px); filter: drop-shadow(-3px 0 #00ffff); }
+            30%  { clip-path: inset(0 0 80% 0); transform: translateX(-3px); }
+            45%  { clip-path: inset(30% 0 30% 0); transform: translateX(4px); filter: drop-shadow(2px 0 #ff0000); }
+            60%  { clip-path: inset(0 0 40% 0); transform: none; filter: none; }
+            75%  { clip-path: inset(0); transform: translateX(-2px); }
+            100% { opacity: 1; clip-path: inset(0); transform: none; filter: none; }
+        }
+
+        /* Scan : balayage d'écran cathodique de haut en bas */
+        .quote-text.anim-scan { animation: dlg-scan 0.45s linear both; }
+        @keyframes dlg-scan {
+            0%   { clip-path: inset(0 0 100% 0); filter: brightness(3); border-left-color: #ff0000; }
+            100% { clip-path: inset(0 0 0 0); filter: brightness(1); border-left-color: #444; }
+        }
+
+        /* Parasites : flou et grésillement */
+        .quote-text.anim-static { animation: dlg-static 0.5s linear both; }
+        @keyframes dlg-static {
+            0%   { opacity: 0; filter: blur(6px) contrast(3); }
+            20%  { opacity: 0.7; }
+            30%  { opacity: 0.1; filter: blur(4px) contrast(2); }
+            50%  { opacity: 0.9; filter: blur(2px); }
+            60%  { opacity: 0.3; }
+            100% { opacity: 1; filter: none; }
+        }
+
+        /* Lampe qui grésille */
+        .quote-text.anim-flicker { animation: dlg-flicker 0.6s steps(1) both; }
+        @keyframes dlg-flicker {
+            0%   { opacity: 0; }
+            10%  { opacity: 1; }
+            15%  { opacity: 0; }
+            30%  { opacity: 0.8; }
+            35%  { opacity: 0; }
+            55%  { opacity: 1; filter: brightness(2); }
+            60%  { opacity: 0.2; }
+            70%  { opacity: 1; filter: none; }
+            100% { opacity: 1; }
+        }
+
+        /* Lignes : chaque réplique arrive l'une après l'autre (délais posés en JS) */
+        @keyframes dlg-line {
+            0%   { opacity: 0; transform: translateX(-12px); }
+            100% { opacity: 1; transform: none; }
+        }
+
         .context-note {
             font-size: 11px;
             color: #777;
@@ -311,7 +420,8 @@
             box-sizing: border-box;
         }
 
-        .lightbox:target {
+        .lightbox:target,
+        .lightbox.open {
             display: flex;
         }
 
@@ -335,35 +445,51 @@
         }
 
         /* --- CHARACTER DESIGN STYLES --- */
-        .char-creator {
-            margin: 0 0 5px 0;
-            font-style: normal;
-            color: var(--text-red);
-            /* Effet Glow Rouge sur le texte du Creator */
-            text-shadow: 0 0 4px #ff55550c, 0 0 10px #ff0000;
-        }
-
-        .char-thatmob {
-            margin: 0 0 5px 0;
-            font-style: normal;
-            color: coral;
-        }
-
+        /* Couleurs du chat Minecraft, une par personnage */
+        .char-creator,
+        .char-twixxel,
+        .char-thatmob,
         .char-idaios {
             margin: 0 0 5px 0;
             font-style: normal;
-            color: darkolivegreen;
         }
 
+        /* Creator : ni gentil ni méchant, sa lueur hésite entre le rouge et l'or */
+        .char-creator {
+            color: #ff6b6b;
+            text-shadow: 0 0 4px #ff0000, 0 0 10px #ff0000;
+            animation: creator-doute 6s ease-in-out infinite;
+        }
+
+        @keyframes creator-doute {
+            0%, 100% { color: #ff6b6b; text-shadow: 0 0 4px #ff0000, 0 0 10px #ff0000; }
+            50%      { color: #ffd966; text-shadow: 0 0 4px #ffaa00, 0 0 10px #ffaa00; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .char-creator { animation: none; }
+        }
+
+        /* Twixxel : le héros, cyan vif, à l'opposé du rouge de Creator */
         .char-twixxel {
-            margin: 0 0 5px 0;
-            font-style: normal;
-            color: var(--text-white);
+            color: #55ffff;
+            text-shadow: 1px 1px 0 #003f3f;
+        }
+
+        .char-thatmob {
+            color: #ffaa00;
+            text-shadow: 1px 1px 0 #3f2a00;
+        }
+
+        .char-idaios {
+            color: #55ff55;
+            text-shadow: 1px 1px 0 #153f15;
         }
 
         .action {
-            margin: 0; 
+            margin: 0;
             color: var(--text-gray);
+            font-style: italic;
         }
 
         .wiki-row.stacked-layout {
@@ -772,6 +898,85 @@
                 </div>
             </div>
 
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#Dream1" class="img-popup-link">
+                        <img src="../Creator/Images/Dream1.webp" alt="Twixxel's dream: a red figure sitting in a dark room">
+                    </a>
+                    <p class="file-name">> Dream1.webp</p>
+                </div>
+                <div class="text-slot">
+                    <details class="mc-dropdown" > 
+                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Where the... Where the heck am I?</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Hello? Hello?... Where the heck am I?</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Is this like a dream or something? Like... what am I?</p>
+                            <p class="char-creator">[Creator] *inaudible* but it's never enough.</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Creator?</p>
+                            <p class="char-creator">[Creator] You *groan* are so ungrateful.</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Wait, what do you mean I'm so...</p>
+                            <p class="char-creator">[Creator] And too quick to *inaudible* one.</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; What... What?</p>
+                            <p class="char-creator">[Creator] New work of art is nearly done.</p>
+                            <p class="char-creator">*howl*</p>
+                            <p class="action">wth is that supposed to mean???</p>
+                        </div>
+                    </details>
+                    <p class="context-note">Twixxel is dreaming</p>
+                </div>
+            </div>
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#idkbro" class="img-popup-link">
+                        <img src="../Creator/Images/idkbro.webp" alt="Twixxel's dream: a red figure sitting in a dark room">
+                    </a>
+                    <p class="file-name">> idkbro.webp</p>
+                </div>
+                <div class="text-slot">
+                    <details class="mc-dropdown" > 
+                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; oh my god... oh my god...</p>
+                            <p class="char-thatmob">&lt;Thatmob&gt; HOLY SHIT!</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; oh my god... *sigh*</p>
+                            <p class="char-idaios">&lt;Idaios&gt; Dude, what the heck were you dreaming about?</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; I was dreaming about...</p>
+                            <p class="char-creator">[Creator] Don't.</p>
+                            <p class="char-thatmob">&lt;Thatmob&gt; About?</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; It's nothing interesting don't worry. It's fine.</p>
+                            <p class="char-thatmob">&lt;Thatmob&gt; Alright, me and Idaios are going out, get some materials like iron and diamonds and all that. You can work on the farm or something. Whatever you want. We'll be back soon.</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Alright, good luck.</p>
+                            <p class="char-idaios">&lt;Idaios&gt; hm. Bye-Byeeeeeee... <button class="yt-clip" data-video="6MkxADy0wAs" data-start="651" data-end="652" title="Listen to this moment">▶ PLAY</button></p>
+                        </div>
+                    </details>
+                    <p class="context-note">Twixxel is dreaming</p>
+                </div>
+            </div>
+
+            <div class="wiki-row">
+                <div class="mc-image-slot">
+                    <a href="#img1" class="img-popup-link">
+                        <img src="https://via.placeholder.com/280x150" alt="Image Placeholder">
+                    </a>
+                    <p class="file-name">> log_scene_01.png</p>
+                </div>
+                <div class="text-slot">
+                    <details class="mc-dropdown"> 
+                        <summary><span class="quote-title"><span class="dropdown-arrow">▶</span> [LOGGED DIALOGUE]</span></summary>
+                        <div class="quote-text">
+                            <p class="char-thatmob">&lt;Thatmob&gt; Your dialogue line here...</p>
+                            <p class="char-twixxel">&lt;Twixxel_lesgo&gt; Your dialogue line here...</p>
+                            <p class="char-idaios">&lt;Idaios&gt; Your dialogue line here...</p>
+                            <p class="action">* Dynamic event description *</p>
+                            <p class="char-creator">[Creator] Glowing creator response here...</p>
+                        </div>
+                    </details>
+                    <p class="context-note">Context note description goes here.</p>
+                </div>
+            </div>
             
 
 
@@ -810,90 +1015,206 @@
         </div> 
     </div>
     
-    <a href="#close" class="lightbox" id="Explore">
+    <!-- Lightbox unique : remplie automatiquement au clic sur n'importe quelle image -->
+    <a href="#close" class="lightbox" id="lightbox">
         <div class="lightbox-content">
-            <img src="../Creator/Images/Explore.webp" alt="Twixxel, Mob and Idaios inside the house">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> Explore.webp</p>
+            <img src="" alt="">
+            <p class="file-name" style="text-align: center; margin-top: 10px;"></p>
         </div>
     </a>
-    <a href="#close" class="lightbox" id="MobPOV">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/MobPOV.webp" alt="mob's POV watching 'Twixxel' build the house">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> MobPOV.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="T-up">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/Thumbs-up.webp" alt="Creator giving a thumbs-up to Twixxel">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> Thumbs-up.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="SleepWell">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/SleepWell.webp" alt="Creator watching Twixxel sleep">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> SleepWell.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="Dialog_2">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/Dialog_2.webp" alt="Dialog 2">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> Dialog_2.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="Dialog_1">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/Dialog_1.webp" alt="Dialog 1">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> Dialog_1.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="here">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/here.webp" alt="Here">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> here.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="ImageCreator">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/ImageCreator.webp" alt="ImageCreator">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> ImageCreator.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="Creator">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/Creator.webp" alt="Creator first appearance">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> Creator.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="Chest">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/Chest.webp" alt="Chest Image">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> Chest.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="Ungrateful">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/Ungrateful.webp" alt="Ungrateful">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> Ungrateful.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="Book1">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/BookPage1.webp" alt="Book Page 1">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> BookPage1.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="Book2">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/BookPage2.webp" alt="Book Page 2">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> BookPage2.webp</p>
-        </div>
-    </a>
-    <a href="#close" class="lightbox" id="Book3">
-        <div class="lightbox-content">
-            <img src="../Creator/Images/BookPage3.webp" alt="Book Page 3">
-            <p class="file-name" style="text-align: center; margin-top: 10px;">> BookPage3.webp</p>
-        </div>
-    </a>
+    <script>
+        (function () {
+            var box = document.getElementById("lightbox");
+            var boxImg = box.querySelector("img");
+            var boxName = box.querySelector(".file-name");
+
+            document.querySelectorAll(".img-popup-link").forEach(function (link) {
+                link.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    var img = link.querySelector("img");
+                    var name = link.parentElement.querySelector(".file-name");
+                    boxImg.src = img.src;
+                    boxImg.alt = img.alt;
+                    boxName.textContent = name ? name.textContent : "> " + img.src.split("/").pop();
+                    box.classList.add("open");
+                });
+            });
+
+            function close(e) {
+                if (e) e.preventDefault();
+                box.classList.remove("open");
+            }
+            box.addEventListener("click", close);
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "Escape") close();
+            });
+        })();
+    </script>
+    <script>
+        // Une animation au hasard (jamais deux fois la même d'affilée) à chaque ouverture/fermeture d'un dialogue
+        (function () {
+            if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+            var ANIMS = ["glitch", "scan", "static", "flicker", "lines", "decrypt"];
+            var DURATION = { glitch: 500, scan: 450, static: 500, flicker: 600 };
+            var NOISE = "▓▒░█#@$%&?!<>/\\";
+            var last = null;
+
+            function pick() {
+                var name;
+                do { name = ANIMS[Math.floor(Math.random() * ANIMS.length)]; } while (name === last);
+                return (last = name);
+            }
+
+            // Lignes : les répliques glissent une par une
+            function lines(box, closing) {
+                var ps = box.querySelectorAll("p");
+                var step = Math.min(60, 600 / ps.length);
+                ps.forEach(function (p, i) {
+                    var order = closing ? ps.length - 1 - i : i;
+                    p.style.animation = "dlg-line 0.25s " + (order * step) + "ms both" + (closing ? " reverse" : "");
+                });
+                return ps.length * step + 250;
+            }
+
+            // Décryptage : le texte se brouille puis se reconstitue (ou l'inverse en fermant)
+            function decrypt(box, closing) {
+                // Seulement le texte de chaque réplique, pour ne pas effacer les boutons ▶ PLAY
+                var nodes = [];
+                box.querySelectorAll("p").forEach(function (p) {
+                    if (p.firstChild && p.firstChild.nodeType === Node.TEXT_NODE) nodes.push(p.firstChild);
+                });
+                var originals = nodes.map(function (n) { return n.nodeValue; });
+                var frames = 14, frame = 0;
+                var timer = setInterval(function () {
+                    frame++;
+                    var t = closing ? 1 - frame / frames : frame / frames;
+                    nodes.forEach(function (n, k) {
+                        var txt = originals[k], out = "";
+                        for (var i = 0; i < txt.length; i++) {
+                            out += (txt[i] === " " || i / txt.length < t) ? txt[i]
+                                 : NOISE[Math.floor(Math.random() * NOISE.length)];
+                        }
+                        n.nodeValue = out;
+                    });
+                    if (frame >= frames) {
+                        clearInterval(timer);
+                        nodes.forEach(function (n, k) { n.nodeValue = originals[k]; });
+                    }
+                }, 35);
+                return frames * 35 + 20;
+            }
+
+            function play(box, closing) {
+                var name = pick();
+                var time;
+                if (name === "lines") time = lines(box, closing);
+                else if (name === "decrypt") time = decrypt(box, closing);
+                else {
+                    box.classList.add("anim-" + name);
+                    if (closing) box.classList.add("anim-out");
+                    time = DURATION[name];
+                }
+                return new Promise(function (done) {
+                    setTimeout(function () {
+                        box.className = "quote-text";
+                        box.querySelectorAll("p").forEach(function (p) { p.style.animation = ""; });
+                        done();
+                    }, time);
+                });
+            }
+
+            document.querySelectorAll(".mc-dropdown").forEach(function (details) {
+                var box = details.querySelector(".quote-text");
+                var busy = false;
+                details.querySelector("summary").addEventListener("click", function (e) {
+                    e.preventDefault();
+                    if (busy || !box) return;
+                    busy = true;
+                    if (!details.open) {
+                        details.open = true;
+                        play(box, false).then(function () { busy = false; });
+                    } else {
+                        play(box, true).then(function () { details.open = false; busy = false; });
+                    }
+                });
+            });
+        })();
+    </script>
+    <script>
+        // Boutons ▶ PLAY : joue un court extrait de la vidéo YouTube dans un mini-lecteur qui se ferme tout seul
+        (function () {
+            var apiReady = null, popup = null, player = null, safety = null, watch = null;
+
+            function loadApi() {
+                if (!apiReady) {
+                    apiReady = new Promise(function (ok) {
+                        window.onYouTubeIframeAPIReady = ok;
+                        var s = document.createElement("script");
+                        s.src = "https://www.youtube.com/iframe_api";
+                        document.head.appendChild(s);
+                    });
+                }
+                return apiReady;
+            }
+
+            function closeClip() {
+                clearTimeout(safety);
+                clearInterval(watch);
+                watch = null;
+                if (player) { player.destroy(); player = null; }
+                if (popup) { popup.remove(); popup = null; }
+            }
+
+            function timecode(s) {
+                return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+            }
+
+            document.querySelectorAll(".yt-clip").forEach(function (btn) {
+                btn.addEventListener("click", function () {
+                    var start = parseInt(btn.dataset.start, 10);
+                    var end = parseFloat(btn.dataset.end);
+                    closeClip();
+
+                    var box = popup = document.createElement("div");
+                    box.className = "yt-clip-player";
+                    box.innerHTML = '<p class="file-name"></p><div class="yt-clip-frame"><div></div></div>';
+                    box.querySelector(".file-name").textContent = "> audio_log_" + timecode(start) + ".rec";
+                    box.addEventListener("click", closeClip);
+                    document.body.appendChild(box);
+
+                    loadApi().then(function () {
+                        if (popup !== box) return; // fermé ou remplacé entre-temps
+                        player = new YT.Player(box.querySelector(".yt-clip-frame div"), {
+                            videoId: btn.dataset.video,
+                            playerVars: { start: start, end: Math.ceil(end), autoplay: 1, controls: 0, rel: 0, playsinline: 1 },
+                            events: {
+                                onReady: function (e) { e.target.playVideo(); },
+                                onStateChange: function (e) {
+                                    // On surveille le temps de lecture et on coupe le son pile à data-end
+                                    if (e.data === YT.PlayerState.PLAYING && !watch) {
+                                        var p = e.target;
+                                        watch = setInterval(function () {
+                                            if (p.getCurrentTime() >= end) {
+                                                p.mute();
+                                                p.pauseVideo();
+                                                clearInterval(watch);
+                                                setTimeout(closeClip, 300);
+                                            }
+                                        }, 20);
+                                    } else if (e.data === YT.PlayerState.ENDED) {
+                                        closeClip();
+                                    }
+                                }
+                            }
+                        });
+                    });
+                    // Au cas où la vidéo ne se lance pas
+                    safety = setTimeout(closeClip, (end - start) * 1000 + 15000);
+                });
+            });
+        })();
+    </script>
 <footer style="max-width: 700px; margin: 0 auto 50px; padding: 16px; text-align: center; font-size: 11px; color: #999999; border-top: 4px solid #000000;">
     <a href="../../mentions-legales.html" style="color: #aaaaaa; text-decoration: none;">Mentions l&eacute;gales</a>
 </footer>
