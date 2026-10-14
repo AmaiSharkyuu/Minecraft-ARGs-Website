@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/webp" href="Characters/Verity/Verity.webp">
+    <title>More Info · Void Archives</title>
+    <meta name="description" content="Debug screen of Void Archives: site version, sitemap, robots.txt and license.">
+    <style>
+        @font-face {
+            font-family: 'Minecraftia';
+            src: local('Minecraftia'), url('Minecraftia.woff') format('woff');
+        }
+
+        html { scrollbar-width: thin; scrollbar-color: #555 #111; }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Minecraftia', 'Courier New', monospace;
+            background: #1a2433;
+            color: #fff;
+            margin: 0;
+            image-rendering: pixelated;
+        }
+
+        /* Le panorama de l'écran titre, flouté et quadrillé par les bordures de chunks */
+        .cube-scene {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            z-index: -2;
+            filter: blur(4px) brightness(0.45) saturate(0.4);
+            transform: scale(1.05);
+        }
+        .cube { position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform-style: preserve-3d; }
+        .cube > div {
+            position: absolute;
+            width: 2052px;
+            height: 2052px;
+            margin: -1026px 0 0 -1026px;
+            background-size: 100% 100%;
+            backface-visibility: hidden;
+        }
+        .cube .f0 { background-image: url('Panorama/panorama_0.webp'); transform: translateZ(-1024px); }
+        .cube .f1 { background-image: url('Panorama/panorama_1.webp'); transform: rotateY(-90deg) translateZ(-1024px); }
+        .cube .f2 { background-image: url('Panorama/panorama_2.webp'); transform: rotateY(180deg) translateZ(-1024px); }
+        .cube .f3 { background-image: url('Panorama/panorama_3.webp'); transform: rotateY(90deg) translateZ(-1024px); }
+        .cube .f4 { background-image: url('Panorama/panorama_4.webp'); transform: rotateX(-90deg) translateZ(-1024px); }
+        .cube .f5 { background-image: url('Panorama/panorama_5.webp'); transform: rotateX(90deg) translateZ(-1024px); }
+        .chunks {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.35;
+            background:
+                repeating-linear-gradient(90deg, #ffff00 0 2px, transparent 2px 128px),
+                repeating-linear-gradient(0deg, #ffff00 0 2px, transparent 2px 128px),
+                repeating-linear-gradient(90deg, rgba(64, 64, 255, 0.7) 0 1px, transparent 1px 16px),
+                repeating-linear-gradient(0deg, rgba(64, 64, 255, 0.7) 0 1px, transparent 1px 16px);
+            background-position: center;
+        }
+
+        /* =========================================================
+           ÉCRAN F3 : les mêmes lignes que sur le menu, à la même place
+           ========================================================= */
+        .debug {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 2px;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+        .debug p {
+            display: table;
+            margin: 0 0 1px;
+            padding: 2px 3px 0;
+            min-height: 1.5em;
+            background: rgba(80, 80, 80, 0.56);
+            color: #e0e0e0;
+        }
+        .debug p.gap { background: none; }
+        .debug .r p { margin-left: auto; }
+        .debug .y { color: #ffff55; }
+        .debug a { color: inherit; }
+
+        /* =========================================================
+           CONTENU
+           ========================================================= */
+        main { max-width: 760px; margin: 0 auto; padding: 24px 16px 20px; }
+
+        .panel {
+            margin: 0 0 18px;
+            padding: 16px 18px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid #000;
+            box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+        }
+        .panel h2 {
+            margin: 0 0 4px;
+            font-weight: normal;
+            font-size: 14px;
+            color: #ffff55;
+            text-shadow: 2px 2px 0 #3f3f00;
+        }
+        .panel .what { margin: 0 0 12px; font-size: 10px; line-height: 1.8; color: #aaaaaa; }
+        pre {
+            margin: 0;
+            padding: 10px 12px;
+            background: rgba(0, 0, 0, 0.55);
+            border: 2px solid #000;
+            font-family: inherit;
+            font-size: 10px;
+            line-height: 1.8;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: 340px;
+            overflow: auto;
+        }
+
+        /* Sitemap : une ligne par page, la priorité en barre d'expérience */
+        .pages { width: 100%; border-collapse: collapse; font-size: 10px; }
+        .pages th { text-align: left; font-weight: normal; color: #aaaaaa; padding: 0 8px 6px 0; }
+        .pages td { padding: 6px 8px 6px 0; border-top: 2px solid rgba(255, 255, 255, 0.06); vertical-align: middle; }
+        .pages a { color: #55ffff; text-decoration: none; }
+        .pages a:hover { color: #ffffa0; text-decoration: underline; }
+        .pages small { display: block; color: #6f6f6f; font-size: 9px; }
+        .xp { display: flex; gap: 1px; width: 110px; }
+        .xp i { flex: 1; height: 6px; background: #202020; border: 1px solid #000; }
+        .xp i.on { background: #80ff20; }
+
+        .mc-btn {
+            display: block;
+            max-width: 300px;
+            margin: 8px auto 0;
+            text-align: center;
+            font-family: inherit;
+            background: #6f6f6f;
+            border: 2px solid #000;
+            box-shadow: inset 2px 2px 0 #aaaaaa, inset -2px -2px 0 #3c3c3c;
+            padding: 10px 12px;
+            color: #e0e0e0;
+            text-decoration: none;
+            font-size: 13px;
+            text-shadow: 2px 2px 0 #383838;
+        }
+        .mc-btn:hover { background: #7e86b8; box-shadow: inset 2px 2px 0 #bec6ff, inset -2px -2px 0 #3a4170; color: #ffffa0; }
+        .hint { text-align: center; font-size: 9px; color: #6f6f6f; margin: 8px 0 0; }
+
+        /* En arrivant du menu : les panneaux apparaissent un par un, par à-coups */
+        .arrive .panel, .arrive .back { animation: pop 0.3s steps(4) both; }
+        .arrive .panel:nth-child(2) { animation-delay: 0.12s; }
+        .arrive .panel:nth-child(3) { animation-delay: 0.24s; }
+        .arrive .back { animation-delay: 0.36s; }
+        @keyframes pop {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: none; }
+        }
+
+        @media (max-width: 560px) {
+            .debug { flex-direction: column; gap: 0; }
+            .debug .r p { margin-left: 0; }
+            .pages .when { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+    </style>
+    <script src="version.js"></script>
+</head>
+<body>
+
+    <div class="cube-scene" id="cubeScene">
+        <div class="cube" id="cube">
+            <div class="f0"></div><div class="f1"></div><div class="f2"></div>
+            <div class="f3"></div><div class="f4"></div><div class="f5"></div>
+        </div>
+    </div>
+    <div class="chunks"></div>
+
+    <div class="debug">
+        <div class="l">
+            <p id="vLine">Minecraft 1.20.1 (Void Archives)</p>
+            <p id="vMessage" class="gap"></p>
+            <p id="vDate" class="gap"></p>
+            <p class="gap"></p>
+            <p>C: <span id="pageCount">?</span> pages (sitemap.xml)</p>
+            <p>E: 3/3 entities (Creator, Verity, The King in Yellow)</p>
+            <p class="gap"></p>
+            <p>Biome: minecraft:the_void</p>
+            <p><span class="y">Targeted Block: minecraft:info_page</span></p>
+        </div>
+        <div class="r">
+            <p>Java: 17.0.8 64bit</p>
+            <p id="display">Display: ?</p>
+            <p class="gap"></p>
+            <p>Archived by Amai</p>
+        </div>
+    </div>
+
+    <main id="main">
+
+        <section class="panel">
+            <h2>Sitemap</h2>
+            <p class="what">The list of pages this site gives to search engines like Google, so they know what to show in their results. The bar is how important each page is for the site.</p>
+            <table class="pages">
+                <thead><tr><th>Page</th><th class="when">Last update</th><th>Priority</th></tr></thead>
+                <tbody id="sitemap"><tr><td colspan="3">Loading sitemap.xml...</td></tr></tbody>
+            </table>
+        </section>
+
+        <section class="panel">
+            <h2>robots.txt</h2>
+            <p class="what">The note left at the door for search engine robots. Here it lets them read every page, and tells them where the sitemap is.</p>
+            <pre id="robots">Loading robots.txt...</pre>
+        </section>
+
+        <section class="panel">
+            <h2>License</h2>
+            <p class="what">The rights on this site. The videos themselves belong to their creators, credited on each page.</p>
+            <pre id="license">Loading LICENSE...</pre>
+        </section>
+
+        <a href="./" class="mc-btn back">&lt; Back to Menu</a>
+        <p class="hint">Esc or F3 also closes this screen</p>
+    </main>
+
+    <script>
+        var CALM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        // Arrivée depuis le bouton More Info : les panneaux entrent l'un après l'autre
+        if (location.hash === "#f3") {
+            document.getElementById("main").classList.add("arrive");
+            history.replaceState(null, "", location.pathname);
+        }
+
+        // Le panorama tourne lentement derrière le flou
+        (function () {
+            var scene = document.getElementById("cubeScene");
+            var cube = document.getElementById("cube");
+            var FOV = 75, yaw = 0, last = performance.now();
+            function fit() {
+                var p = innerHeight / 2 / Math.tan(FOV * Math.PI / 360);
+                scene.style.perspective = p + "px";
+                cube.dataset.p = p;
+            }
+            function frame(now) {
+                yaw = (yaw + (now - last) * 0.003) % 360;
+                last = now;
+                cube.style.transform = "translateZ(" + cube.dataset.p + "px) rotateX(8deg) rotateY(" + yaw.toFixed(3) + "deg)";
+                if (!CALM) requestAnimationFrame(frame);
+            }
+            fit();
+            addEventListener("resize", fit);
+            requestAnimationFrame(frame);
+        })();
+
+        function show() { document.getElementById("display").textContent = "Display: " + innerWidth + "x" + innerHeight; }
+        show();
+        addEventListener("resize", show);
+
+        // Version : dernier commit GitHub, sinon rien
+        getSiteVersion(function (v) {
+            if (!v) return;
+            var line = document.getElementById("vLine");
+            line.innerHTML = 'Minecraft 1.20.1 (Void Archives/<a target="_blank" rel="noopener"></a>)';
+            line.firstElementChild.href = v.url;
+            line.firstElementChild.textContent = v.number;
+            var msg = document.getElementById("vMessage");
+            msg.textContent = "Commit " + v.sha + ": " + v.message;
+            msg.className = "";
+            var date = document.getElementById("vDate");
+            date.textContent = "Updated: " + new Date(v.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+            date.className = "";
+        });
+
+        // Noms lisibles des pages du sitemap
+        var NAMES = {
+            "/": "Main Menu",
+            "/Characters/Creator/": "Creator",
+            "/Characters/Verity/": "Verity (choose a timeline)",
+            "/Characters/Verity/thatmob.html": "Verity: ThatMob's story",
+            "/Characters/Verity/grox.html": "Verity: Grox's story",
+            "/Characters/TheKingInYellow/": "The King in Yellow"
+        };
+
+        function text(file) {
+            return fetch(file, { cache: "no-cache" }).then(function (r) { if (!r.ok) throw r.status; return r.text(); });
+        }
+
+        text("sitemap.xml").then(function (xml) {
+            var doc = new DOMParser().parseFromString(xml, "application/xml");
+            var urls = Array.prototype.slice.call(doc.getElementsByTagName("url"));
+            var body = document.getElementById("sitemap");
+            body.innerHTML = "";
+            urls.forEach(function (u) {
+                var loc = u.getElementsByTagName("loc")[0].textContent;
+                var path = new URL(loc).pathname;
+                var mod = u.getElementsByTagName("lastmod")[0];
+                var prio = u.getElementsByTagName("priority")[0];
+                var p = prio ? parseFloat(prio.textContent) : 0.5;
+
+                var tr = document.createElement("tr");
+                var a = document.createElement("a");
+                a.href = "." + path;
+                a.textContent = NAMES[path] || path;
+                var small = document.createElement("small");
+                small.textContent = path;
+                var td1 = document.createElement("td");
+                td1.append(a, small);
+                var td2 = document.createElement("td");
+                td2.className = "when";
+                td2.textContent = mod ? mod.textContent : "";
+                var td3 = document.createElement("td");
+                var xp = document.createElement("div");
+                xp.className = "xp";
+                xp.title = "Priority " + p.toFixed(1);
+                for (var i = 0; i < 10; i++) {
+                    var seg = document.createElement("i");
+                    if (i < Math.round(p * 10)) seg.className = "on";
+                    xp.appendChild(seg);
+                }
+                td3.appendChild(xp);
+                tr.append(td1, td2, td3);
+                body.appendChild(tr);
+            });
+            document.getElementById("pageCount").textContent = urls.length + "/" + urls.length;
+        }).catch(function () {
+            document.getElementById("sitemap").innerHTML = "<tr><td colspan=3>Could not read sitemap.xml</td></tr>";
+        });
+
+        text("robots.txt").then(function (t) { document.getElementById("robots").textContent = t.trim(); })
+            .catch(function () { document.getElementById("robots").textContent = "Could not read robots.txt"; });
+        text("LICENSE").then(function (t) { document.getElementById("license").textContent = t.trim(); })
+            .catch(function () { document.getElementById("license").textContent = "Could not read LICENSE"; });
+
+        // Échap ou F3 referment l'écran de debug
+        addEventListener("keydown", function (e) {
+            if (e.key === "Escape" || e.key === "F3") { e.preventDefault(); location.href = "./"; }
+        });
+    </script>
+</body>
+</html>

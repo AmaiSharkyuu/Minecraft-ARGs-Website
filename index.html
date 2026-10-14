@@ -329,8 +329,15 @@
         .note p:last-child { margin: 0; text-align: right; color: #5a3a00; }
         .note b { color: #8a1010; font-weight: normal; }
 
-        .spacer { flex: 1; min-height: 30px; }
+        /* la place du coin en bas, pour qu'il ne cache jamais la fin de la note */
+        .spacer { flex: 1; min-height: 60px; }
+        /* Collé en bas de l'écran comme sur l'écran titre, visible sans faire défiler */
         .corner {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 5;
             display: flex;
             justify-content: space-between;
             gap: 12px;
@@ -338,6 +345,58 @@
             font-size: 10px;
             color: #fff;
             text-shadow: 2px 2px 0 #3f3f3f;
+        }
+        .corner .more { color: #fff; margin-left: 10px; }
+        .corner .more:hover { color: #ffffa0; }
+
+        /* =========================================================
+           MORE INFO : l'écran de debug (F3) s'ouvre par-dessus le menu,
+           puis les bordures de chunks (F3+G) quadrillent l'écran
+           ========================================================= */
+        .debug {
+            position: fixed;
+            inset: 0;
+            z-index: 998;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 2px;
+            font-size: 11px;
+            line-height: 1.5;
+            pointer-events: none;
+        }
+        .debug p {
+            display: table;
+            margin: 0 0 1px;
+            padding: 2px 3px 0;
+            min-height: 1.5em;
+            background: rgba(80, 80, 80, 0.56);
+            color: #e0e0e0;
+            text-shadow: none;
+            visibility: hidden;
+        }
+        .debug p.gap { background: none; }
+        .debug p.on { visibility: visible; }
+        .debug .r p { margin-left: auto; }
+        .debug .y { color: #ffff55; }
+        .chunks {
+            position: fixed;
+            inset: 0;
+            z-index: 997;
+            pointer-events: none;
+            background:
+                repeating-linear-gradient(90deg, #ffff00 0 2px, transparent 2px 128px),
+                repeating-linear-gradient(0deg, #ffff00 0 2px, transparent 2px 128px),
+                repeating-linear-gradient(90deg, rgba(64, 64, 255, 0.7) 0 1px, transparent 1px 16px),
+                repeating-linear-gradient(0deg, rgba(64, 64, 255, 0.7) 0 1px, transparent 1px 16px);
+            background-position: center;
+            clip-path: circle(0 at var(--x) var(--y));
+            animation: chunks 0.55s steps(10) forwards;
+        }
+        @keyframes chunks { to { clip-path: circle(150% at var(--x) var(--y)); } }
+        body.f3-on > :not(.debug):not(.chunks):not(script) {
+            transition: filter 0.6s steps(6);
+            filter: blur(4px) brightness(0.45) saturate(0.4);
         }
 
         /* Petit fondu au noir en chargeant un monde */
@@ -370,6 +429,7 @@
         }
     </style>
     <script src="void-arrive.js"></script>
+    <script src="version.js"></script>
 </head>
 <body>
 
@@ -450,7 +510,7 @@
     <div class="spacer"></div>
 
     <div class="corner">
-        <span>Void Archives 1.20.1</span>
+        <span><span id="version">Void Archives</span><a href="info.html" class="more" id="more">More Info</a></span>
         <span>Archived by Amai</span>
     </div>
 
@@ -567,6 +627,70 @@
 
             // En revenant en arrière, on enlève l'écran de chargement
             addEventListener("pageshow", function () { document.querySelectorAll(".loading").forEach(function (d) { d.remove(); }); });
+
+            // Version du site = dernier commit GitHub ; sans réponse, juste "Void Archives"
+            var version = null;
+            getSiteVersion(function (v) {
+                version = v;
+                if (v) document.getElementById("version").textContent = "Void Archives " + v.number;
+            });
+
+            // More Info : l'écran F3 s'écrit ligne par ligne, puis les bordures de chunks partent du lien
+            var more = document.getElementById("more");
+            more.addEventListener("click", function (e) {
+                if (CALM || body.classList.contains("f3-on")) return;
+                e.preventDefault();
+                var num = version ? version.number : "release";
+                var sha = version ? version.sha : "unknown";
+                var x = Math.round(Math.random() * 4000 - 2000), z = Math.round(Math.random() * 4000 - 2000);
+                var left = [
+                    "Minecraft 1.20.1 (Void Archives/" + num + ")",
+                    "60 fps T: vsync fancy clouds",
+                    "Integrated server @ 0 ms ticks",
+                    "C: 6/6 pages (sitemap.xml)",
+                    "E: 3/3 entities (Creator, Verity, The King in Yellow)",
+                    "",
+                    "XYZ: " + x + ".500 / 64.00000 / " + z + ".500",
+                    "Facing: bottom-left (More Info)",
+                    "Biome: minecraft:the_void",
+                    "",
+                    "<span class=y>Targeted Block: minecraft:info_page</span>"
+                ];
+                var right = [
+                    "Java: 17.0.8 64bit",
+                    "Mem: " + (40 + Math.floor(Math.random() * 30)) + "% 1337/2048MB",
+                    "Display: " + innerWidth + "x" + innerHeight,
+                    "",
+                    "Commit: " + sha,
+                    "Archived by Amai"
+                ];
+                function col(lines, cls) {
+                    return '<div class="' + cls + '">' + lines.map(function (l) { return "<p" + (l ? "" : ' class="gap"') + ">" + l + "</p>"; }).join("") + "</div>";
+                }
+                var f3 = document.createElement("div");
+                f3.className = "debug";
+                f3.innerHTML = col(left, "l") + col(right, "r");
+                body.appendChild(f3);
+
+                var lines = f3.querySelectorAll("p");
+                lines.forEach(function (p, i) { setTimeout(function () { p.classList.add("on"); }, 35 * i); });
+
+                setTimeout(function () {
+                    var r = more.getBoundingClientRect();
+                    var g = document.createElement("div");
+                    g.className = "chunks";
+                    g.style.setProperty("--x", (r.left + r.width / 2) + "px");
+                    g.style.setProperty("--y", (r.top + r.height / 2) + "px");
+                    body.appendChild(g);
+                    body.classList.add("f3-on");
+                }, 35 * lines.length + 150);
+
+                setTimeout(function () { location.href = "info.html#f3"; }, 35 * lines.length + 900);
+            });
+            addEventListener("pageshow", function () {
+                body.classList.remove("f3-on");
+                document.querySelectorAll(".debug, .chunks").forEach(function (d) { d.remove(); });
+            });
 
             // De temps en temps, le logo grésille quand un monde d'horreur est sélectionné
             if (!CALM) setInterval(function () { if (body.classList.contains("theme-red") && Math.random() < 0.6) glitch(); }, 2200);
